@@ -1,0 +1,173 @@
+@use '../../../../styles/feature-page' as feature;
+
+@include feature.page;
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+/*
+  Force every top-level section to occupy
+  a separate full-width row.
+*/
+.feature-page {
+  display: grid !important;
+  width: 100%;
+  min-width: 0;
+
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-flow: row !important;
+  align-items: start;
+
+  gap: var(--msx-space-5);
+}
+
+.feature-page > app-page-header,
+.feature-page > .feature-grid,
+.feature-page > .feature-card {
+  display: block;
+  grid-column: 1 / -1 !important;
+
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+
+  box-sizing: border-box;
+  position: relative;
+}
+
+/*
+  Keep summary cards on one row.
+*/
+.lead-details__summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+  gap: var(--msx-space-4);
+  align-items: stretch;
+}
+
+/*
+  Keep action cards on a separate row.
+*/
+.lead-details__action-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+  gap: var(--msx-space-4);
+  align-items: start;
+}
+
+.lead-details__summary-grid > .feature-card,
+.lead-details__action-grid > .feature-card {
+  display: block;
+  grid-column: auto !important;
+
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.lead-details__summary-grid > .feature-card {
+  height: 100%;
+}
+
+.lead-details__summary-grid p {
+  margin-bottom: var(--msx-space-4);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+/*
+  Each action form uses one internal column.
+*/
+.lead-details__action-grid > .form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) !important;
+
+  gap: var(--msx-space-4);
+  align-content: start;
+}
+
+.lead-details__action-grid .form-field,
+.lead-details__action-grid .form-field--full {
+  grid-column: 1 / -1 !important;
+
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lead-details__action-grid label {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+
+.lead-details__action-grid input,
+.lead-details__action-grid select,
+.lead-details__action-grid textarea,
+.lead-details__action-grid .msx-input {
+  display: block;
+
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+
+  box-sizing: border-box;
+}
+
+.lead-details__action-grid textarea {
+  resize: vertical;
+}
+
+.lead-details__action-grid .action-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.lead-details__action-grid .msx-button {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/*
+  Other forms on the page remain responsive.
+*/
+.feature-card .form-grid {
+  min-width: 0;
+}
+
+.feature-card .form-field {
+  min-width: 0;
+}
+
+.feature-card input,
+.feature-card select,
+.feature-card textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+  .lead-details__summary-grid,
+  .lead-details__action-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .feature-card {
+    padding: var(--msx-space-4);
+  }
+
+  .lead-details__action-grid .msx-button {
+    width: 100%;
+  }
+}

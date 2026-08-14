@@ -1,0 +1,61 @@
+<app-page-header
+  eyebrow="Inventory"
+  title="Batch expiry"
+  subtitle="Prioritize near-expiry stock and identify expired or blocked batches before reservation and dispatch."
+/>
+<section class="filter-bar multi">
+  <label
+    >SKU<select [(ngModel)]="skuID">
+      <option [ngValue]="null">All SKUs</option>
+      @for (item of skus(); track item.skuID) {
+        <option [ngValue]="item.skuID">{{ item.skuCode }} — {{ item.skuName }}</option>
+      }
+    </select></label
+  ><label>Warning horizon (days)<input type="number" min="1" [(ngModel)]="warningDays" /></label
+  ><label class="checkbox"
+    ><input type="checkbox" [(ngModel)]="includeExpired" /> Include expired</label
+  ><button type="button" (click)="load()">Refresh</button>
+</section>
+@if (loading()) {
+  <app-loading-panel message="Loading batches..." />
+} @else if (error()) {
+  <div class="alert error">{{ error() }}</div>
+} @else if (!filteredRows().length) {
+  <app-empty-state title="No batches within the warning horizon" />
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Batch</th>
+          <th>Manufactured</th>
+          <th>Expiry</th>
+          <th>Cost price</th>
+          <th>Batch status</th>
+          <th>Expiry risk</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filteredRows(); track item.batchID) {
+          <tr>
+            <td>{{ item.skuCode }}</td>
+            <td>{{ item.batchNo }}</td>
+            <td>
+              {{ item.manufacturingDate ? (item.manufacturingDate | date: 'mediumDate') : '—' }}
+            </td>
+            <td>{{ item.expiryDate ? (item.expiryDate | date: 'mediumDate') : '—' }}</td>
+            <td>{{ item.costPrice | number: '1.2-2' }}</td>
+            <td>{{ statusLabel(item.status) }}</td>
+            <td>
+              <app-status-badge
+                [label]="expiryLabel(item.expiryDate)"
+                [tone]="expiryTone(item.expiryDate)"
+              />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

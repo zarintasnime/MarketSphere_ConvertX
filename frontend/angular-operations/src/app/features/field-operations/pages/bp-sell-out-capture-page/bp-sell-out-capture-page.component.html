@@ -1,0 +1,79 @@
+<section class="field-page">
+  <div class="field-page__heading">
+    <div>
+      <h1>Capture BP Sell-Out</h1>
+      <p>Submit promoter sell-out quantities and selling prices for verification.</p>
+    </div>
+  </div>
+  @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+  }
+  @if (successMessage()) {
+    <p class="field-success">{{ successMessage() }}</p>
+  }
+  <div class="field-card">
+    <form class="field-grid" [formGroup]="headerForm">
+      <div class="field-control">
+        <label>Client ID</label
+        ><input class="field-input" type="number" formControlName="clientID" />
+      </div>
+      <div class="field-control">
+        <label>Visit ID</label><input class="field-input" type="number" formControlName="visitID" />
+      </div>
+      <div class="field-control">
+        <label>Campaign ID</label
+        ><input class="field-input" type="number" formControlName="campaignID" />
+      </div>
+      <div class="field-control">
+        <label>Sell-out date</label
+        ><input class="field-input" type="date" formControlName="sellOutDate" />
+      </div>
+    </form>
+    <button class="field-button field-button--secondary" type="button" (click)="captureLocation()">
+      Capture location
+    </button>
+    @if (locationData(); as gps) {
+      <p class="field-success">{{ gps.latitude.toFixed(6) }}, {{ gps.longitude.toFixed(6) }}</p>
+    }
+  </div>
+  <div class="field-card">
+    <h2>Add SKU</h2>
+    <form class="field-grid" [formGroup]="itemForm" (ngSubmit)="addItem()">
+      <div class="field-control">
+        <label>SKU ID</label><input class="field-input" type="number" formControlName="skuID" />
+      </div>
+      <div class="field-control">
+        <label>Quantity sold</label
+        ><input class="field-input" type="number" step="0.01" formControlName="quantitySold" />
+      </div>
+      <div class="field-control">
+        <label>Unit selling price</label
+        ><input class="field-input" type="number" step="0.01" formControlName="unitSellingPrice" />
+      </div>
+      <button class="field-button" type="submit">Add SKU</button>
+    </form>
+  </div>
+  <ul class="field-list">
+    @for (item of items(); track $index) {
+      <li>
+        <div class="field-page__heading">
+          <span
+            >SKU {{ item.skuID }} | Quantity {{ item.quantitySold }} | Price
+            {{ item.unitSellingPrice ?? 'Not set' }}</span
+          ><button
+            class="field-button field-button--danger"
+            type="button"
+            (click)="removeItem($index)"
+          >
+            Remove
+          </button>
+        </div>
+      </li>
+    } @empty {
+      <li>No SKU lines have been added.</li>
+    }
+  </ul>
+  <button class="field-button" type="button" (click)="submit()" [disabled]="saving()">
+    {{ saving() ? 'Submitting...' : 'Submit sell-out' }}
+  </button>
+</section>

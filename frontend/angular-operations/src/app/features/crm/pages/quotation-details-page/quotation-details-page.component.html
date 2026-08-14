@@ -1,0 +1,163 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    title="Quotation Details"
+    subtitle="Review quotation versions, commercial totals, item lines, and approval status."
+    secondaryActionLabel="Back to quotations"
+    (secondaryAction)="router.navigate(['/crm/quotations'])"
+  />
+
+  @if (loading()) {
+    <app-loading-panel message="Loading quotation details..." />
+  } @else if (details(); as item) {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+
+    <div class="metric-grid">
+      <div class="feature-card metric-tile">
+        <span>Quotation</span><strong>{{ item.quotationNo }}</strong
+        ><small>Version {{ item.versionNo }}</small>
+      </div>
+      <div class="feature-card metric-tile">
+        <span>Status</span
+        ><app-status-badge [label]="statusLabel(item.status)" [tone]="statusTone(item.status)" />
+      </div>
+      <div class="feature-card metric-tile">
+        <span>Net Amount</span><strong>{{ item.netAmount | number: '1.2-2' }}</strong
+        ><small
+          >{{ item.validFrom | date: 'mediumDate' }} to
+          {{ item.validUntil | date: 'mediumDate' }}</small
+        >
+      </div>
+      <div class="feature-card metric-tile">
+        <span>Client</span><strong>#{{ item.clientID }}</strong
+        ><small>Opportunity {{ item.opportunityID ?? 'None' }}</small>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>Commercial Summary</h2>
+        <span>Root quotation {{ item.rootQuotationID ?? item.quotationID }}</span>
+      </div>
+      <div class="details-grid">
+        <div>
+          <span>Gross amount</span><strong>{{ item.grossAmount | number: '1.2-2' }}</strong>
+        </div>
+        <div>
+          <span>Discount amount</span><strong>{{ item.discountAmount | number: '1.2-2' }}</strong>
+        </div>
+        <div>
+          <span>Tax amount</span><strong>{{ item.taxAmount | number: '1.2-2' }}</strong>
+        </div>
+        <div>
+          <span>Accepted at</span
+          ><strong>{{
+            item.acceptedAt ? (item.acceptedAt | date: 'medium') : 'Not accepted'
+          }}</strong>
+        </div>
+        <div>
+          <span>Campaign ID</span><strong>{{ item.campaignID ?? 'None' }}</strong>
+        </div>
+        <div>
+          <span>Price list ID</span><strong>{{ item.priceListID ?? 'None' }}</strong>
+        </div>
+      </div>
+      <p class="note-block">
+        <strong>Terms:</strong> {{ item.terms || 'No terms were recorded.' }}
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>Quotation Items</h2>
+        <span>{{ item.items.length }} line(s)</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Discount</th>
+              <th>Tax</th>
+              <th>Line Total</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (line of item.items; track line.quotationItemID) {
+              <tr>
+                <td>#{{ line.skuID }}</td>
+                <td>{{ line.quantity }}</td>
+                <td>{{ line.unitPrice | number: '1.2-2' }}</td>
+                <td>{{ line.discountAmount | number: '1.2-2' }} ({{ line.discountPercent }}%)</td>
+                <td>{{ line.taxAmount | number: '1.2-2' }}</td>
+                <td>{{ line.lineTotal | number: '1.2-2' }}</td>
+                <td>{{ line.note || '—' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No quotation items were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="feature-card action-panel">
+      <div>
+        <h2>Quotation Actions</h2>
+        <p>
+          Draft editing requires management permission. Status transitions require quotation
+          approval permission.
+        </p>
+      </div>
+      <div class="action-row">
+        @if (canEditDraft()) {
+          <button
+            class="msx-button msx-button--primary"
+            type="button"
+            (click)="router.navigate(['/crm/quotations', item.quotationID, 'edit'])"
+          >
+            Edit draft
+          </button>
+        }
+        @if (canManage()) {
+          <button
+            class="msx-button msx-button--secondary"
+            type="button"
+            [disabled]="busy()"
+            (click)="createVersion()"
+          >
+            Create new version
+          </button>
+        }
+      </div>
+      @if (canApprove()) {
+        <form class="inline-form" [formGroup]="statusForm" (ngSubmit)="changeStatus()">
+          <div class="form-field">
+            <label>New status</label
+            ><select class="msx-input" formControlName="status">
+              @for (option of statusOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+          <button class="msx-button msx-button--primary" type="submit" [disabled]="busy()">
+            Apply status
+          </button>
+        </form>
+      }
+    </div>
+  } @else {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() || 'Quotation details are unavailable.' }}</p>
+    </div>
+  }
+</section>

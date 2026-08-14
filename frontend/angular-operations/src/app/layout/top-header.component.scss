@@ -1,0 +1,106 @@
+:host {
+  display: block;
+}
+.top-header {
+  display: flex;
+  min-height: 4.6rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--msx-space-4);
+  border-bottom: 1px solid var(--msx-border-color);
+  background: var(--msx-surface);
+  padding: 0 var(--msx-space-5);
+}
+.top-header__eyebrow {
+  margin: 0 0 0.15rem;
+  color: var(--msx-text-secondary);
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.top-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.top-header__refresh {
+  border: 0;
+  color: var(--msx-color-primary-700);
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+.top-header__refresh:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.top-header__notification-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.45rem;
+  border: 1px solid var(--msx-border-color);
+  border-radius: 0.7rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--msx-text-primary);
+  background: var(--msx-surface-muted);
+  text-decoration: none;
+  font-weight: 800;
+}
+.top-header__notification-link:hover {
+  border-color: var(--msx-color-primary-500);
+  color: var(--msx-color-primary-700);
+}
+.top-header__badge {
+  display: grid;
+  place-items: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  padding: 0 0.3rem;
+  color: #fff;
+  background: var(--msx-color-danger-700);
+  font-size: 0.72rem;
+}
+.top-header__profile {
+  display: flex;
+  align-items: center;
+  gap: var(--msx-space-3);
+}
+.top-header__profile span {
+  display: grid;
+  text-align: right;
+}
+.top-header__profile small {
+  color: var(--msx-text-secondary);
+}
+@media (max-width: 900px) {
+  .top-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-block: var(--msx-space-3);
+  }
+  .top-header__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .top-header__profile {
+    margin-left: auto;
+  }
+}
+@media (max-width: 640px) {
+  .top-header__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .top-header__profile {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+  .top-header__profile span {
+    text-align: left;
+  }
+}

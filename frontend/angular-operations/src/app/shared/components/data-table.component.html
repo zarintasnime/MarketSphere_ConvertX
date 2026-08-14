@@ -1,0 +1,30 @@
+<div class="data-table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        @for (column of columns; track column.key) {
+          <th [style.width]="column.width || null">{{ column.label }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows; track row[rowKey]) {
+        <tr
+          [class.data-table__row--selectable]="selectable"
+          [class.data-table__row--selected]="isSelected(row)"
+          (click)="selectRow(row)"
+        >
+          @for (column of columns; track column.key) {
+            <td>{{ displayValue(row[column.key]) }}</td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td class="data-table__empty" [attr.colspan]="columns.length || 1">
+            {{ emptyMessage }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

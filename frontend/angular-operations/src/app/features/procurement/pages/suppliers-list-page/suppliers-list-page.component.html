@@ -1,0 +1,72 @@
+<app-page-header
+  eyebrow="Procurement"
+  title="Suppliers"
+  subtitle="Maintain supplier profiles, payment terms, status, and supplied SKUs."
+  primaryActionLabel="New supplier"
+  (primaryAction)="newSupplier.click()"
+/>
+<a #newSupplier class="visually-hidden" routerLink="/procurement/suppliers/new">New supplier</a>
+
+<section class="filter-bar">
+  <label
+    >Search<input [(ngModel)]="search" (keyup.enter)="load(1)" placeholder="Code, name, phone"
+  /></label>
+  <button type="button" class="secondary" (click)="load(1)">Search</button>
+</section>
+
+@if (loading()) {
+  <app-loading-panel message="Loading suppliers..." />
+} @else if (error()) {
+  <div class="alert error">{{ error() }}</div>
+} @else if (suppliers().length === 0) {
+  <app-empty-state
+    title="No suppliers found"
+    message="Create a supplier or change the search criteria."
+    actionLabel="Clear search"
+    (actionRequested)="search = ''; load(1)"
+  />
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Supplier</th>
+          <th>Phone</th>
+          <th>Terms</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of suppliers(); track item.supplierID) {
+          <tr>
+            <td>{{ item.supplierCode }}</td>
+            <td>{{ item.supplierName }}</td>
+            <td>{{ item.phone || '—' }}</td>
+            <td>{{ item.paymentTermsDays }} days</td>
+            <td>
+              <app-status-badge
+                [label]="statusLabel(item.status)"
+                [tone]="statusTone(item.status)"
+              />
+            </td>
+            <td class="actions">
+              <a [routerLink]="['/procurement/suppliers', item.supplierID, 'edit']">Edit</a
+              ><button type="button" class="link" (click)="changeStatus(item)">
+                {{ item.status === 1 ? 'Deactivate' : 'Activate' }}
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <app-pagination
+    [pageNumber]="pageNumber"
+    [pageSize]="pageSize"
+    [totalCount]="totalCount()"
+    [totalPages]="totalPages()"
+    (pageChange)="load($event)"
+  />
+}

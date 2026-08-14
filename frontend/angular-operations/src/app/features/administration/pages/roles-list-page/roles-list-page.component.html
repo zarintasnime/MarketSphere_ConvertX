@@ -1,0 +1,122 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Administration"
+    title="Roles"
+    subtitle="Maintain application roles and open the permission matrix."
+    [primaryActionLabel]="canCreate() ? 'New role' : ''"
+    (primaryAction)="newRole()"
+  />
+  <div class="feature-grid">
+    <div class="feature-card feature-card--half">
+      <div class="feature-card__header"><h2>Role list</h2></div>
+      @if (loading()) {
+        <app-loading-panel [compact]="true" message="Loading roles..." />
+      }
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Level</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (role of roles(); track role.roleID) {
+              <tr>
+                <td>
+                  <strong>{{ role.roleName }}</strong
+                  ><br /><span class="muted-text">{{ role.roleCode }}</span>
+                </td>
+                <td>{{ role.roleLevel }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="role.isActive ? 'Active' : 'Inactive'"
+                    [tone]="role.isActive ? 'success' : 'neutral'"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    @if (canUpdate()) {
+                      <button
+                        class="msx-button msx-button--secondary"
+                        type="button"
+                        (click)="select(role)"
+                      >
+                        Edit
+                      </button>
+                    }
+                    @if (canManagePermissions()) {
+                      <button
+                        class="msx-button msx-button--secondary"
+                        type="button"
+                        (click)="openPermissions(role)"
+                      >
+                        Permissions
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-row">No roles were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <form class="feature-card feature-card--half" [formGroup]="form" (ngSubmit)="save()">
+      <div class="feature-card__header">
+        <h2>{{ selectedRoleID() ? 'Edit role' : 'Create role' }}</h2>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="roleCode">Role code</label
+          ><input id="roleCode" class="msx-input" formControlName="roleCode" />
+        </div>
+        <div class="form-field">
+          <label for="roleName">Role name</label
+          ><input id="roleName" class="msx-input" formControlName="roleName" />
+        </div>
+        <div class="form-field">
+          <label for="roleLevel">Role level</label
+          ><input id="roleLevel" type="number" class="msx-input" formControlName="roleLevel" />
+        </div>
+        <label class="checkbox-field"
+          ><input type="checkbox" formControlName="isActive" /> Active</label
+        >
+        <div class="form-field form-field--full">
+          <label for="description">Description</label
+          ><textarea
+            id="description"
+            class="msx-input"
+            rows="4"
+            formControlName="description"
+          ></textarea>
+        </div>
+      </div>
+      <div class="action-row">
+        <button
+          type="submit"
+          class="msx-button msx-button--primary"
+          [disabled]="
+            saving() ||
+            (!selectedRoleID() && !canCreate()) ||
+            (selectedRoleID() !== null && !canUpdate())
+          "
+        >
+          {{ saving() ? 'Saving...' : 'Save role' }}</button
+        ><button type="button" class="msx-button msx-button--secondary" (click)="newRole()">
+          Clear
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

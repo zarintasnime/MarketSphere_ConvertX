@@ -1,0 +1,7 @@
+using MarketSphere.Domain.Enums;
+
+namespace MarketSphere.Application.Modules.MarketingField.DTOs;
+
+public sealed record SamplingLogListDto(int SamplingLogID, int? VisitID, int? CampaignID, int? ClientID, int? LeadID, int EmployeeID, int SKUID, decimal IssuedQuantity, decimal ConsumedQuantity, decimal ReturnedQuantity, decimal DamagedQuantity, DateOnly SampleDate, SamplingOutcome Outcome, bool FollowUpRequired);
+public sealed record SamplingLogDetailsDto(int SamplingLogID, int? VisitID, int? CampaignID, int? ClientID, int? LeadID, int EmployeeID, int SKUID, decimal IssuedQuantity, decimal ConsumedQuantity, decimal ReturnedQuantity, decimal DamagedQuantity, DateOnly SampleDate, string? FeedbackSummary, SamplingOutcome Outcome, bool FollowUpRequired, int? IssueStockMovementID, int? ReturnStockMovementID, int? DamageStockMovementID);
+public sealed class SaveSamplingLogRequestDto { public int? VisitID { get; init; } public int? CampaignID { get; init; } public int? ClientID { get; init; } public int? LeadID { get; init; } public int EmployeeID { get; init; } public int SKUID { get; init; } public decimal IssuedQuantity { get; init; } public decimal ConsumedQuantity { get; init; } public decimal ReturnedQuantity { get; init; } public decimal DamagedQuantity { get; init; } public DateOnly SampleDate { get; init; } public string? FeedbackSummary { get; init; } public SamplingOutcome Outcome { get; init; } public bool FollowUpRequired { get; init; } }

@@ -1,0 +1,44 @@
+<nav class="pagination" aria-label="Pagination">
+  <p class="pagination__summary">
+    Showing {{ firstItemNumber }} to {{ lastItemNumber }} of {{ totalCount }} records
+  </p>
+
+  @if (totalPages > 1) {
+    <div class="pagination__controls">
+      <button
+        type="button"
+        class="pagination__button pagination__button--text"
+        [disabled]="disabled || pageNumber <= 1"
+        (click)="goToPage(pageNumber - 1)"
+      >
+        Previous
+      </button>
+
+      @for (page of visiblePages; track $index) {
+        @if (page === null) {
+          <span class="pagination__ellipsis" aria-hidden="true">…</span>
+        } @else {
+          <button
+            type="button"
+            class="pagination__button"
+            [class.pagination__button--active]="page === pageNumber"
+            [attr.aria-current]="page === pageNumber ? 'page' : null"
+            [disabled]="disabled"
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        }
+      }
+
+      <button
+        type="button"
+        class="pagination__button pagination__button--text"
+        [disabled]="disabled || pageNumber >= totalPages"
+        (click)="goToPage(pageNumber + 1)"
+      >
+        Next
+      </button>
+    </div>
+  }
+</nav>

@@ -1,0 +1,66 @@
+<app-page-header
+  eyebrow="Inventory"
+  title="Stock movements"
+  subtitle="Trace every stock in, stock out, transfer, return, reservation, and adjustment entry."
+/>
+<section class="filter-bar multi">
+  <label
+    >Warehouse<select [(ngModel)]="warehouseID">
+      <option [ngValue]="null">All warehouses</option>
+      @for (item of warehouses(); track item.warehouseID) {
+        <option [ngValue]="item.warehouseID">{{ item.warehouseName }}</option>
+      }
+    </select></label
+  ><label
+    >SKU<select [(ngModel)]="skuID">
+      <option [ngValue]="null">All SKUs</option>
+      @for (item of skus(); track item.skuID) {
+        <option [ngValue]="item.skuID">{{ item.skuCode }} — {{ item.skuName }}</option>
+      }
+    </select></label
+  ><label>From<input type="date" [(ngModel)]="from" /></label
+  ><label>To<input type="date" [(ngModel)]="to" /></label
+  ><button type="button" (click)="load()">Apply</button>
+</section>
+@if (loading()) {
+  <app-loading-panel message="Loading stock movements..." />
+} @else if (error()) {
+  <div class="alert error">{{ error() }}</div>
+} @else if (!rows().length) {
+  <app-empty-state title="No stock movements found" />
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Warehouse</th>
+          <th>SKU</th>
+          <th>Batch</th>
+          <th>Type</th>
+          <th>In</th>
+          <th>Out</th>
+          <th>Balance</th>
+          <th>Reference</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of rows(); track item.stockMovementID) {
+          <tr>
+            <td>{{ item.movementAt | date: 'medium' }}</td>
+            <td><strong>{{ item.warehouseName }}</strong><small class="cell-meta">#{{ item.warehouseID }}</small></td>
+            <td><strong>{{ item.skuCode }}</strong><small class="cell-meta">{{ item.skuName }}</small></td>
+            <td>{{ item.batchNo || '—' }}</td>
+            <td>{{ label(item.movementType) }}</td>
+            <td>{{ item.quantityIn | number: '1.2-2' }}</td>
+            <td>{{ item.quantityOut | number: '1.2-2' }}</td>
+            <td>{{ item.balanceAfter | number: '1.2-2' }}</td>
+            <td>{{ item.referenceType }} #{{ item.referenceID }}</td>
+            <td>{{ item.note || '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

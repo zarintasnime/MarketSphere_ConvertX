@@ -1,0 +1,89 @@
+<app-page-header
+  eyebrow="Procurement"
+  title="Purchase requisitions"
+  subtitle="Request required stock and control submission and approval."
+  primaryActionLabel="New requisition"
+  (primaryAction)="newLink.click()"
+/><a #newLink class="visually-hidden" routerLink="/procurement/purchase-requisitions/new"
+  >New requisition</a
+>
+<section class="filter-bar">
+  <label>Search<input [(ngModel)]="search" (keyup.enter)="load(1)" /></label
+  ><button type="button" class="secondary" (click)="load(1)">Search</button>
+</section>
+@if (loading()) {
+  <app-loading-panel message="Loading requisitions..." />
+} @else if (error()) {
+  <div class="alert error">{{ error() }}</div>
+} @else if (!rows().length) {
+  <app-empty-state title="No requisitions found" />
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Branch</th>
+          <th>Requested by</th>
+          <th>Required date</th>
+          <th>Estimated amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of rows(); track item.purchaseRequisitionID) {
+          <tr>
+            <td>{{ item.purchaseRequisitionNo }}</td>
+            <td>{{ item.branchName }}</td>
+            <td>{{ item.requestedBy }}</td>
+            <td>{{ item.requiredDate | date: 'mediumDate' }}</td>
+            <td>{{ item.estimatedAmount | number: '1.2-2' }}</td>
+            <td><app-status-badge [label]="label(item.status)" [tone]="tone(item.status)" /></td>
+            <td class="actions">
+              <a
+                [routerLink]="[
+                  '/procurement/purchase-requisitions',
+                  item.purchaseRequisitionID,
+                  'edit',
+                ]"
+                >Open</a
+              >
+              @if (item.status === 1) {
+                <button
+                  class="link"
+                  type="button"
+                  (click)="setStatus(item.purchaseRequisitionID, 2)"
+                >
+                  Submit
+                </button>
+              }
+              @if (item.status === 2) {
+                <button
+                  class="link"
+                  type="button"
+                  (click)="setStatus(item.purchaseRequisitionID, 3)"
+                >
+                  Approve</button
+                ><button
+                  class="link danger"
+                  type="button"
+                  (click)="setStatus(item.purchaseRequisitionID, 4)"
+                >
+                  Reject
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <app-pagination
+    [pageNumber]="pageNumber"
+    [pageSize]="pageSize"
+    [totalCount]="totalCount()"
+    [totalPages]="totalPages()"
+    (pageChange)="load($event)"
+  />
+}

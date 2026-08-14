@@ -1,0 +1,4 @@
+using MarketSphere.Application.Common.Models;
+using MarketSphere.Application.Modules.OrderFulfilment.DTOs;
+namespace MarketSphere.Application.Modules.OrderFulfilment.Interfaces;
+public interface IPickListService { Task<PagedResult<PickListListDto>> GetAsync(PagedRequest request, CancellationToken cancellationToken = default); Task<PickListDetailsDto> GetByIdAsync(int id, CancellationToken cancellationToken = default); Task<int> CreateAsync(CreatePickListRequestDto request, CancellationToken cancellationToken = default); Task ReleaseAsync(int id, ReleasePickListRequestDto request, CancellationToken cancellationToken = default); Task RecordPickAsync(int id, RecordPickRequestDto request, CancellationToken cancellationToken = default); Task VerifyAsync(int id, VerifyPickListRequestDto request, CancellationToken cancellationToken = default); }

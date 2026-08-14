@@ -1,0 +1,13 @@
+<nav class="field-nav" aria-label="Field workspace navigation">
+  @for (item of items; track item.route) {
+    <a [routerLink]="item.route" routerLinkActive="field-nav__item--active" class="field-nav__item">
+      <span class="field-nav__icon">
+        {{ item.icon }}
+        @if (item.route === '/field/notifications' && unreadCount() > 0) {
+          <strong class="field-nav__badge">{{ unreadCount() }}</strong>
+        }
+      </span>
+      <span>{{ item.label }}</span>
+    </a>
+  }
+</nav>

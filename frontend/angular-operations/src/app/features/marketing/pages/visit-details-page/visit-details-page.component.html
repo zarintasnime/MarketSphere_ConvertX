@@ -1,0 +1,73 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Marketing"
+    title="Visit Details"
+    subtitle="Inspect the field visit timeline, captured coordinates, notes, and evidence."
+  />
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading visit..." />
+  } @else if (item(); as visit) {
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>Visit #{{ visit.visitID }}</h2>
+        <app-status-badge
+          [label]="visit.isSuspiciousLocation ? 'Location review required' : 'Location accepted'"
+          [tone]="visit.isSuspiciousLocation ? 'warning' : 'success'"
+        />
+      </div>
+      <div class="detail-grid">
+        <div>
+          <span>Employee ID</span><strong>{{ visit.employeeID }}</strong>
+        </div>
+        <div>
+          <span>Client ID</span><strong>{{ visit.clientID }}</strong>
+        </div>
+        <div>
+          <span>Route ID</span><strong>{{ visit.routeID ?? 'Not assigned' }}</strong>
+        </div>
+        <div>
+          <span>Campaign ID</span><strong>{{ visit.campaignID ?? 'Not linked' }}</strong>
+        </div>
+        <div>
+          <span>Check-in</span><strong>{{ visit.checkInAt }}</strong>
+        </div>
+        <div>
+          <span>Check-out</span><strong>{{ visit.checkOutAt || 'Active' }}</strong>
+        </div>
+        <div>
+          <span>Check-in GPS</span
+          ><strong>{{ visit.checkInGPSLat }}, {{ visit.checkInGPSLng }}</strong>
+        </div>
+        <div>
+          <span>Accuracy</span><strong>{{ visit.accuracyMeters ?? 'Unknown' }} m</strong>
+        </div>
+      </div>
+      <p>{{ visit.note || 'No note was recorded.' }}</p>
+    </div>
+    <div class="feature-card">
+      <h2>Evidence files</h2>
+      <ul class="record-list">
+        @for (file of attachments(); track file.fileAttachmentID) {
+          <li>
+            <span>{{ file.fileName }} ({{ file.mimeType }})</span
+            ><button
+              class="msx-button msx-button--secondary"
+              type="button"
+              (click)="download(file)"
+            >
+              Download
+            </button>
+          </li>
+        } @empty {
+          <li>No evidence files are attached.</li>
+        }
+      </ul>
+    </div>
+    <a class="msx-button msx-button--secondary" routerLink="/marketing/visits">Back to visits</a>
+  }
+</section>

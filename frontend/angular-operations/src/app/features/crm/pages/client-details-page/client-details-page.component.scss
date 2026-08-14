@@ -1,0 +1,215 @@
+@use '../../../../styles/feature-page' as feature;
+
+@include feature.page;
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.feature-page {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  container-type: inline-size;
+}
+
+.feature-page > app-page-header,
+.feature-page > .feature-grid,
+.feature-page > .feature-card {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.feature-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: var(--msx-space-4);
+  align-items: start;
+}
+
+.feature-grid > .feature-card,
+.feature-grid > .feature-card--half,
+.feature-grid > form.feature-card {
+  grid-column: auto;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.feature-card {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.feature-card h2,
+.feature-card h3 {
+  overflow-wrap: anywhere;
+}
+
+.feature-card p {
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+}
+
+.feature-card__header {
+  min-width: 0;
+}
+
+.feature-card__header > * {
+  min-width: 0;
+}
+
+form,
+.form-grid,
+.form-field,
+.action-row,
+.checkbox-field {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.form-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--msx-space-4);
+  align-items: start;
+}
+
+.form-field {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: 0.45rem;
+}
+
+.form-field--full,
+.action-row.form-field--full {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.msx-input,
+.form-field input,
+.form-field select,
+.form-field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+textarea.msx-input,
+.form-field textarea {
+  resize: vertical;
+}
+
+.checkbox-field {
+  display: inline-flex;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.6rem;
+  overflow-wrap: anywhere;
+}
+
+.checkbox-field input[type='checkbox'] {
+  width: auto;
+  min-width: auto;
+  max-width: none;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.action-row {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.action-row .msx-button {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.table-wrap {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.table-wrap table {
+  min-width: 42rem;
+}
+
+/*
+  Credit Profile and Lifecycle cards can become narrow
+  because the sidebar reduces the available content width.
+  Their forms switch to one column inside a narrow container.
+*/
+@container (max-width: 48rem) {
+  .feature-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .feature-grid > .feature-card,
+  .feature-grid > .feature-card--half,
+  .feature-grid > form.feature-card {
+    grid-column: 1 / -1;
+  }
+
+  .feature-card > .form-grid,
+  form.feature-card.form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .feature-card > .form-grid > .form-field,
+  .feature-card > .form-grid > .checkbox-field,
+  form.feature-card.form-grid > .form-field,
+  form.feature-card.form-grid > .checkbox-field {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .feature-card {
+    padding: var(--msx-space-4);
+  }
+
+  .feature-grid,
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-field,
+  .checkbox-field,
+  .action-row {
+    grid-column: 1 / -1;
+  }
+
+  .action-row .msx-button {
+    width: 100%;
+  }
+}

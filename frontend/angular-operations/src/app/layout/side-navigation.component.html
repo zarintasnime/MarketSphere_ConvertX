@@ -1,0 +1,77 @@
+<aside class="side-navigation">
+  <a
+    class="side-navigation__brand"
+    routerLink="/dashboard"
+    aria-label="MarketSphere Operations Portal"
+  >
+    <span class="side-navigation__mark">MX</span>
+
+    <span class="side-navigation__brand-text">
+      <strong>MarketSphere</strong>
+      <small>Operations Portal</small>
+    </span>
+  </a>
+
+  <nav class="side-navigation__links" aria-label="Operations navigation">
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="side-navigation__link--active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ariaCurrentWhenActive="page"
+      class="side-navigation__link side-navigation__dashboard-link"
+    >
+      Dashboard
+    </a>
+
+    @for (group of groups; track group.key) {
+      @if (canShowGroup(group)) {
+        <section
+          class="side-navigation__group"
+          [class.side-navigation__group--active]="isGroupActive(group)"
+        >
+          <button
+            type="button"
+            class="side-navigation__group-button"
+            [class.side-navigation__group-button--active]="isGroupActive(group)"
+            [attr.aria-expanded]="isGroupOpen(group.key)"
+            [attr.aria-controls]="'navigation-group-' + group.key"
+            (click)="toggleGroup(group.key)"
+          >
+            <span>{{ group.label }}</span>
+
+            <span
+              class="side-navigation__chevron"
+              [class.side-navigation__chevron--open]="isGroupOpen(group.key)"
+              aria-hidden="true"
+            >
+              ›
+            </span>
+          </button>
+
+          <div
+            class="side-navigation__group-panel"
+            [class.side-navigation__group-panel--open]="isGroupOpen(group.key)"
+            [id]="'navigation-group-' + group.key"
+          >
+            <div class="side-navigation__group-items">
+              @for (item of group.items; track item.route) {
+                @if (canShow(item)) {
+                  <a
+                    [routerLink]="item.route"
+                    routerLinkActive="side-navigation__link--active"
+                    ariaCurrentWhenActive="page"
+                    class="side-navigation__link side-navigation__child-link"
+                  >
+                    <span class="side-navigation__child-dot" aria-hidden="true"></span>
+
+                    <span>{{ item.label }}</span>
+                  </a>
+                }
+              }
+            </div>
+          </div>
+        </section>
+      }
+    }
+  </nav>
+</aside>

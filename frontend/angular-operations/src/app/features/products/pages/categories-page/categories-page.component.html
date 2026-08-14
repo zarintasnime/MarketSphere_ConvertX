@@ -1,0 +1,129 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Product and Pricing"
+    title="Product Categories"
+    subtitle="Maintain the category hierarchy used by products, pricing, and reporting."
+  />
+
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+
+  @if (canManage()) {
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <div>
+          <h2>{{ editingID() ? 'Edit category' : 'Create category' }}</h2>
+          <p class="muted-text">Codes should remain stable after transactions begin.</p>
+        </div>
+        @if (editingID()) {
+          <button type="button" class="msx-button msx-button--secondary" (click)="reset()">
+            Cancel edit
+          </button>
+        }
+      </div>
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label for="categoryCode">Category code</label
+          ><input id="categoryCode" class="msx-input" formControlName="categoryCode" />
+        </div>
+        <div class="form-field">
+          <label for="categoryName">Category name</label
+          ><input id="categoryName" class="msx-input" formControlName="categoryName" />
+        </div>
+        <div class="form-field">
+          <label for="categoryType">Category type</label
+          ><select id="categoryType" class="msx-input" formControlName="categoryType">
+            @for (option of typeOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="parentCategory">Parent category</label
+          ><select id="parentCategory" class="msx-input" formControlName="parentProductCategoryID">
+            <option [ngValue]="null">No parent</option>
+            @for (item of categories(); track item.productCategoryID) {
+              @if (item.productCategoryID !== editingID()) {
+                <option [ngValue]="item.productCategoryID">{{ item.categoryName }}</option>
+              }
+            }
+          </select>
+        </div>
+        <label class="checkbox-field form-field--full"
+          ><input type="checkbox" formControlName="isActive" /> Active</label
+        >
+        <div class="action-row form-field--full">
+          <button type="submit" class="msx-button msx-button--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save category' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (loading()) {
+    <app-loading-panel message="Loading categories..." />
+  } @else {
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Parent ID</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of categories(); track item.productCategoryID) {
+              <tr>
+                <td>{{ item.categoryCode }}</td>
+                <td>
+                  <strong>{{ item.categoryName }}</strong>
+                </td>
+                <td>{{ typeLabel(item.categoryType) }}</td>
+                <td>{{ item.parentProductCategoryID ?? 'Root' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="item.isActive ? 'Active' : 'Inactive'"
+                    [tone]="item.isActive ? 'success' : 'neutral'"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    @if (canManage()) {
+                      <button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="edit(item)"
+                      >
+                        Edit</button
+                      ><button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="toggleStatus(item)"
+                      >
+                        {{ item.isActive ? 'Deactivate' : 'Activate' }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-row">No product categories were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</section>

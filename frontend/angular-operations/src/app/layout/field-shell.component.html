@@ -1,0 +1,40 @@
+<div class="field-shell">
+  <header class="field-shell__header">
+    <a class="field-shell__brand" routerLink="/field/home" aria-label="Field workspace home">
+      <span class="field-shell__mark">MX</span>
+      <span>
+        <strong>Field Workspace</strong>
+        <small>MarketSphere ConvertX</small>
+      </span>
+    </a>
+
+    <div class="field-shell__actions">
+      <button
+        type="button"
+        class="field-shell__alert-button"
+        (click)="refreshNotifications()"
+        aria-label="Refresh field notifications"
+      >
+        Refresh
+      </button>
+      <a
+        routerLink="/field/notifications"
+        class="field-shell__alert-link"
+        aria-label="Open field notifications"
+      >
+        Alerts
+        @if (unreadCount() > 0) {
+          <strong>{{ unreadCount() }}</strong>
+        }
+      </a>
+      <span class="field-shell__user-name">{{ currentUser()?.fullName }}</span>
+      <button type="button" class="field-shell__logout" (click)="logout()">Sign out</button>
+    </div>
+  </header>
+
+  <main class="field-shell__content">
+    <router-outlet />
+  </main>
+
+  <app-field-bottom-navigation />
+</div>

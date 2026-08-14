@@ -1,0 +1,38 @@
+@use '../../../../styles/feature-page' as feature;
+@include feature.page;
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+.detail-grid div {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.8rem;
+  border-radius: 0.7rem;
+  background: #f5f8fc;
+}
+.detail-grid span {
+  color: #52657d;
+  font-size: 0.78rem;
+}
+.record-list {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+.record-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem;
+  background: #f7f9fc;
+  border-radius: 0.7rem;
+}
+@media (max-width: 760px) {
+  .detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,247 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Product and Pricing"
+    title="SKUs"
+    subtitle="Maintain sellable units, prices, sizes, and barcodes."
+    [primaryActionLabel]="canManage() ? 'Create SKU' : ''"
+    (primaryAction)="openCreate()"
+  />
+
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="skuSearch"> Search </label>
+
+        <input
+          id="skuSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="SKU code, SKU name, or product"
+        />
+      </div>
+
+      <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+
+  @if (editorOpen()) {
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>
+          {{ editingID() ? 'Edit SKU' : 'Create SKU' }}
+        </h2>
+
+        <button type="button" class="msx-button msx-button--secondary" (click)="closeEditor()">
+          Close
+        </button>
+      </div>
+
+      @if (editorErrorMessage()) {
+        <p class="error-message">
+          {{ editorErrorMessage() }}
+        </p>
+      }
+
+      @if (editorLoading()) {
+        <app-loading-panel message="Loading SKU editor..." />
+      } @else {
+        <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+          <div class="form-field">
+            <label for="skuProduct"> Product </label>
+
+            <select id="skuProduct" class="msx-input" formControlName="productID">
+              <option [ngValue]="0">Select product</option>
+
+              @for (item of products(); track item.productID) {
+                <option [ngValue]="item.productID">
+                  {{ item.productName }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="skuCode"> SKU code </label>
+
+            <input id="skuCode" class="msx-input" formControlName="skuCode" />
+          </div>
+
+          <div class="form-field">
+            <label for="skuName"> SKU name </label>
+
+            <input id="skuName" class="msx-input" formControlName="skuName" />
+          </div>
+
+          <div class="form-field">
+            <label for="skuSize"> Size </label>
+
+            <input id="skuSize" class="msx-input" formControlName="size" />
+          </div>
+
+          <div class="form-field">
+            <label for="skuUnit"> Unit </label>
+
+            <input id="skuUnit" class="msx-input" formControlName="unit" />
+          </div>
+
+          <div class="form-field">
+            <label for="skuBarcode"> Barcode </label>
+
+            <input id="skuBarcode" class="msx-input" formControlName="barcode" />
+          </div>
+
+          <div class="form-field">
+            <label for="skuMrp"> MRP </label>
+
+            <input
+              id="skuMrp"
+              type="number"
+              min="0"
+              step="0.01"
+              class="msx-input"
+              formControlName="mrp"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="skuTradePrice"> Standard trade price </label>
+
+            <input
+              id="skuTradePrice"
+              type="number"
+              min="0"
+              step="0.01"
+              class="msx-input"
+              formControlName="standardTradePrice"
+            />
+          </div>
+
+          <label class="checkbox-field form-field--full">
+            <input type="checkbox" formControlName="isActive" />
+
+            Active
+          </label>
+
+          <div class="action-row form-field--full">
+            <button
+              type="submit"
+              class="msx-button msx-button--primary"
+              [disabled]="saving() || editorLoading()"
+            >
+              {{ saving() ? 'Saving...' : 'Save SKU' }}
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <app-loading-panel message="Loading SKUs..." />
+  } @else {
+    <div class="feature-card">
+      @if (listErrorMessage()) {
+        <p class="error-message">
+          {{ listErrorMessage() }}
+        </p>
+      }
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Product</th>
+              <th>Size / Unit</th>
+              <th>MRP</th>
+              <th>Trade Price</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (item of result().items; track item.skuID) {
+              <tr>
+                <td>
+                  <strong>
+                    {{ item.skuName }}
+                  </strong>
+
+                  <br />
+
+                  <span class="muted-text">
+                    {{ item.skuCode }}
+                  </span>
+                </td>
+
+                <td>
+                  {{ item.productName }}
+                </td>
+
+                <td>
+                  {{ item.size || '—' }}
+                  /
+                  {{ item.unit }}
+                </td>
+
+                <td>
+                  {{ item.mrp | number: '1.2-2' }}
+                </td>
+
+                <td>
+                  {{ item.standardTradePrice | number: '1.2-2' }}
+                </td>
+
+                <td>
+                  <app-status-badge
+                    [label]="item.isActive ? 'Active' : 'Inactive'"
+                    [tone]="item.isActive ? 'success' : 'neutral'"
+                  />
+                </td>
+
+                <td>
+                  <div class="action-row">
+                    @if (canManage()) {
+                      <button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="edit(item)"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="toggleStatus(item)"
+                      >
+                        {{ item.isActive ? 'Deactivate' : 'Activate' }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No SKUs were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

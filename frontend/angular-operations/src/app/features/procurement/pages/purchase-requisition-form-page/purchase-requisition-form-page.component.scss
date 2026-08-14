@@ -1,0 +1,89 @@
+@use '../../../../styles/feature-page' as feature;
+@include feature.page;
+
+.filter-bar.multi {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+.form-card,
+.section-card {
+  margin-block: 1rem;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+}
+.form-grid .wide {
+  grid-column: 1 / -1;
+}
+.line-item,
+.receipt-item {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border-color, #dbe3ef);
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-block: 1rem;
+}
+.metrics article {
+  padding: 1rem;
+  border: 1px solid var(--border-color, #dbe3ef);
+  border-radius: 0.75rem;
+  background: #fff;
+}
+.metrics span {
+  display: block;
+  color: #64748b;
+}
+.metrics strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.35rem;
+}
+.line-total,
+.summary-total {
+  font-weight: 700;
+}
+.summary-total {
+  margin-top: 1rem;
+  text-align: right;
+}
+.readonly-field {
+  padding: 0.7rem;
+  border-radius: 0.5rem;
+  background: #f1f5f9;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+@media (max-width: 720px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

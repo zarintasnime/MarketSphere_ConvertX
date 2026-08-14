@@ -1,0 +1,7 @@
+using MarketSphere.Domain.Enums;
+
+namespace MarketSphere.Application.Modules.MarketingField.DTOs;
+
+public sealed record MarketObservationListDto(int MarketObservationID, int VisitID, int ClientID, int EmployeeID, MarketObservationType ObservationType, int? SKUID, AvailabilityStatus? AvailabilityStatus, string? CompetitorBrand, decimal? CompetitorPrice);
+public sealed record MarketObservationDetailsDto(int MarketObservationID, int VisitID, int ClientID, int EmployeeID, MarketObservationType ObservationType, int? SKUID, AvailabilityStatus? AvailabilityStatus, int? FacingCount, decimal? PlanogramScore, decimal? DisplayScore, string? CompetitorBrand, string? CompetitorProduct, decimal? CompetitorPrice, string? CompetitorOffer, string? Note);
+public sealed class SaveMarketObservationRequestDto { public int VisitID { get; init; } public int ClientID { get; init; } public int EmployeeID { get; init; } public MarketObservationType ObservationType { get; init; } public int? SKUID { get; init; } public AvailabilityStatus? AvailabilityStatus { get; init; } public int? FacingCount { get; init; } public decimal? PlanogramScore { get; init; } public decimal? DisplayScore { get; init; } public string? CompetitorBrand { get; init; } public string? CompetitorProduct { get; init; } public decimal? CompetitorPrice { get; init; } public string? CompetitorOffer { get; init; } public string? Note { get; init; } }

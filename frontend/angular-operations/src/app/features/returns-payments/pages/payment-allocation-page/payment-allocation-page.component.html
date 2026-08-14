@@ -1,0 +1,116 @@
+<app-page-header
+  eyebrow="Returns and Payments"
+  title="Payment allocation"
+  subtitle="Allocate the receipt across one or more invoices and reverse incorrect allocations through compensating entries."
+/>
+@if (loading()) {
+  <app-loading-panel message="Loading payment allocation..." />
+}
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (success()) {
+  <div class="alert success">{{ success() }}</div>
+}
+@if (item(); as payment) {
+  <section class="section-card">
+    <div class="section-heading">
+      <div>
+        <h2>{{ payment.paymentNo }}</h2>
+        <p>
+          Client #{{ payment.clientID }} · {{ methodLabel(payment.paymentMethod) }} ·
+          {{ statusLabel(payment.status) }}
+        </p>
+      </div>
+    </div>
+    <div class="metrics">
+      <div class="metric">
+        <span>Payment date</span><strong>{{ payment.paymentDate | date: 'mediumDate' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Amount</span><strong>{{ payment.amount | number: '1.2-2' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Reference</span><strong>{{ payment.referenceNo || '—' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Proof attachment</span><strong>{{ payment.proofFileAttachmentID || '—' }}</strong>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Allocation</th>
+            <th>Invoice</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Allocated at</th>
+            <th>By</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (allocation of payment.allocations; track allocation.paymentAllocationID) {
+            <tr>
+              <td>#{{ allocation.paymentAllocationID }}</td>
+              <td>#{{ allocation.invoiceID }}</td>
+              <td>{{ allocationLabel(allocation.allocationType) }}</td>
+              <td>{{ allocation.allocatedAmount | number: '1.2-2' }}</td>
+              <td>{{ allocation.allocatedAt | date: 'medium' }}</td>
+              <td>#{{ allocation.allocatedByUserID }}</td>
+              <td>
+                @if (allocation.allocationType === 1) {
+                  <button
+                    type="button"
+                    class="link"
+                    (click)="reverse(allocation.paymentAllocationID)"
+                  >
+                    Reverse
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-row">No allocations recorded.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (payment.status === 1) {
+      <form [formGroup]="form" (ngSubmit)="confirm()">
+        <div class="section-heading">
+          <h3>New allocations</h3>
+          <button type="button" class="secondary" (click)="addAllocation()">Add allocation</button>
+        </div>
+        <div formArrayName="allocations" class="line-grid">
+          @for (group of allocations.controls; track $index) {
+            <div class="line-card line-form" [formGroupName]="$index">
+              <div class="wide">
+                <label>Invoice</label
+                ><select formControlName="invoiceID">
+                  <option [ngValue]="0">Select invoice</option>
+                  @for (invoice of invoices(); track invoice.invoiceID) {
+                    <option [ngValue]="invoice.invoiceID">
+                      {{ invoice.invoiceNo }} · Due {{ invoice.dueAmount | number: '1.2-2' }}
+                    </option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label>Amount</label><input type="number" step="0.01" formControlName="amount" />
+              </div>
+              <button type="button" class="danger" (click)="removeAllocation($index)">
+                Remove
+              </button>
+            </div>
+          }
+        </div>
+        <div class="actions"><button type="submit">Confirm payment and allocate</button></div>
+      </form>
+    }
+    <div class="actions"><a routerLink="/returns-payments/payments">Back to payments</a></div>
+  </section>
+}

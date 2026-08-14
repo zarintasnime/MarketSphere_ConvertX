@@ -1,0 +1,170 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Organization"
+    title="Geography"
+    subtitle="Maintain the Region → Area → Territory hierarchy."
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading geography..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    <div class="geo-grid">
+      <section class="feature-card">
+        <div class="feature-card__header">
+          <h2>Regions</h2>
+          <button type="button" class="msx-button msx-button--secondary" (click)="resetRegion()">
+            New
+          </button>
+        </div>
+        <div class="entity-list">
+          @for (item of regions(); track item.regionID) {
+            <button
+              type="button"
+              [class.entity-list__item--active]="selectedRegionID() === item.regionID"
+              class="entity-list__item"
+              (click)="selectRegion(item)"
+            >
+              <strong>{{ item.regionName }}</strong
+              ><small>{{ item.regionCode }}</small>
+            </button>
+          } @empty {
+            <p class="muted-text">No regions.</p>
+          }
+        </div>
+        <form [formGroup]="regionForm" (ngSubmit)="saveRegion()">
+          <div class="form-field">
+            <label>Company</label
+            ><select class="msx-input" formControlName="companyID">
+              @for (company of companies(); track company.companyID) {
+                <option [ngValue]="company.companyID">{{ company.companyName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Code</label><input class="msx-input" formControlName="regionCode" />
+          </div>
+          <div class="form-field">
+            <label>Name</label><input class="msx-input" formControlName="regionName" />
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isActive" /> Active</label
+          ><button
+            class="msx-button msx-button--primary"
+            type="submit"
+            [disabled]="saving() || !canManage()"
+          >
+            Save region
+          </button>
+        </form>
+      </section>
+      <section class="feature-card">
+        <div class="feature-card__header">
+          <h2>Areas</h2>
+          <button type="button" class="msx-button msx-button--secondary" (click)="resetArea()">
+            New
+          </button>
+        </div>
+        <div class="entity-list">
+          @for (item of areas(); track item.areaID) {
+            <button
+              type="button"
+              [class.entity-list__item--active]="selectedAreaID() === item.areaID"
+              class="entity-list__item"
+              (click)="selectArea(item)"
+            >
+              <strong>{{ item.areaName }}</strong
+              ><small>{{ item.areaCode }}</small>
+            </button>
+          } @empty {
+            <p class="muted-text">Select a region.</p>
+          }
+        </div>
+        <form [formGroup]="areaForm" (ngSubmit)="saveArea()">
+          <div class="form-field">
+            <label>Region</label
+            ><select
+              class="msx-input"
+              formControlName="regionID"
+              (change)="loadAreas(areaForm.controls.regionID.value)"
+            >
+              @for (item of regions(); track item.regionID) {
+                <option [ngValue]="item.regionID">{{ item.regionName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Code</label><input class="msx-input" formControlName="areaCode" />
+          </div>
+          <div class="form-field">
+            <label>Name</label><input class="msx-input" formControlName="areaName" />
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isActive" /> Active</label
+          ><button
+            class="msx-button msx-button--primary"
+            type="submit"
+            [disabled]="saving() || !canManage()"
+          >
+            Save area
+          </button>
+        </form>
+      </section>
+      <section class="feature-card">
+        <div class="feature-card__header">
+          <h2>Territories</h2>
+          <button type="button" class="msx-button msx-button--secondary" (click)="resetTerritory()">
+            New
+          </button>
+        </div>
+        <div class="entity-list">
+          @for (item of territories(); track item.territoryID) {
+            <button
+              type="button"
+              [class.entity-list__item--active]="selectedTerritoryID() === item.territoryID"
+              class="entity-list__item"
+              (click)="selectTerritory(item)"
+            >
+              <strong>{{ item.territoryName }}</strong
+              ><small>{{ item.territoryCode }}</small>
+            </button>
+          } @empty {
+            <p class="muted-text">Select an area.</p>
+          }
+        </div>
+        <form [formGroup]="territoryForm" (ngSubmit)="saveTerritory()">
+          <div class="form-field">
+            <label>Area</label
+            ><select
+              class="msx-input"
+              formControlName="areaID"
+              (change)="loadTerritories(territoryForm.controls.areaID.value)"
+            >
+              @for (item of areas(); track item.areaID) {
+                <option [ngValue]="item.areaID">{{ item.areaName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Code</label><input class="msx-input" formControlName="territoryCode" />
+          </div>
+          <div class="form-field">
+            <label>Name</label><input class="msx-input" formControlName="territoryName" />
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isActive" /> Active</label
+          ><button
+            class="msx-button msx-button--primary"
+            type="submit"
+            [disabled]="saving() || !canManage()"
+          >
+            Save territory
+          </button>
+        </form>
+      </section>
+    </div>
+  }
+</section>

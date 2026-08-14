@@ -1,0 +1,82 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Product and Pricing"
+    [title]="isEdit() ? 'Edit Product' : 'Create Product'"
+    subtitle="Configure the product identity, classification, and batch requirements."
+    secondaryActionLabel="Back to products"
+    (secondaryAction)="router.navigate(['/products/list'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading product form..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label for="productCode">Product code</label
+          ><input id="productCode" class="msx-input" formControlName="productCode" />
+        </div>
+        <div class="form-field">
+          <label for="productName">Product name</label
+          ><input id="productName" class="msx-input" formControlName="productName" />
+        </div>
+        <div class="form-field">
+          <label for="category">Category</label
+          ><select id="category" class="msx-input" formControlName="productCategoryID">
+            <option [ngValue]="0">Select category</option>
+            @for (item of categories(); track item.productCategoryID) {
+              <option [ngValue]="item.productCategoryID">{{ item.categoryName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="brand">Brand</label
+          ><select id="brand" class="msx-input" formControlName="brandID">
+            <option [ngValue]="0">Select brand</option>
+            @for (item of brands(); track item.brandID) {
+              <option [ngValue]="item.brandID">{{ item.brandName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="productType">Product type</label
+          ><select id="productType" class="msx-input" formControlName="productType">
+            @for (option of productTypeOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field form-field--full">
+          <label for="description">Description</label
+          ><textarea
+            id="description"
+            class="msx-input"
+            rows="4"
+            formControlName="description"
+          ></textarea>
+        </div>
+        <label class="checkbox-field"
+          ><input type="checkbox" formControlName="requiresBatch" /> Requires batch tracking</label
+        ><label class="checkbox-field"
+          ><input type="checkbox" formControlName="requiresExpiryDate" /> Requires expiry
+          date</label
+        ><label class="checkbox-field"
+          ><input type="checkbox" formControlName="isActive" /> Active</label
+        >
+        <div class="action-row form-field--full">
+          <button type="submit" class="msx-button msx-button--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save product' }}</button
+          ><button
+            type="button"
+            class="msx-button msx-button--secondary"
+            (click)="router.navigate(['/products/list'])"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>

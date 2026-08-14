@@ -1,0 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MarketSphere.Domain.Entities.Infrastructure;
+namespace MarketSphere.Infrastructure.Persistence.Configurations.Infrastructure;
+public sealed class NumberSequenceConfiguration : IEntityTypeConfiguration<NumberSequence> { public void Configure(EntityTypeBuilder<NumberSequence> builder) { builder.ToTable("NumberSequences", t => { t.HasCheckConstraint("CK_NumberSequences_LastNumber", "[LastNumber] >= 0"); t.HasCheckConstraint("CK_NumberSequences_Padding", "[PaddingLength] BETWEEN 1 AND 20"); }); builder.HasKey(x => x.NumberSequenceID); builder.Property(x => x.DocumentType).HasMaxLength(100).IsRequired(); builder.Property(x => x.Prefix).HasMaxLength(30).IsRequired(); builder.Property(x => x.ResetPolicy).HasMaxLength(30).IsRequired(); builder.Property(x => x.RowVersion).IsRowVersion(); builder.HasIndex(x => new { x.DocumentType, x.YearValue, x.BranchID }).IsUnique(); builder.HasOne(x => x.Branch).WithMany().HasForeignKey(x => x.BranchID).OnDelete(DeleteBehavior.Restrict); } }

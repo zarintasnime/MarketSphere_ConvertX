@@ -1,0 +1,5 @@
+using MarketSphere.Domain.Entities.CRM;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+namespace MarketSphere.Infrastructure.Persistence.Configurations.CRM;
+public sealed class CRMActivityParticipantConfiguration : IEntityTypeConfiguration<CRMActivityParticipant> { public void Configure(EntityTypeBuilder<CRMActivityParticipant> b) { b.ToTable("CRMActivityParticipants", t => t.HasCheckConstraint("CK_CRMActivityParticipants_Identity", "[EmployeeID] IS NOT NULL OR [ClientContactID] IS NOT NULL OR [ExternalName] IS NOT NULL OR [ExternalEmail] IS NOT NULL")); b.HasKey(x => x.CRMActivityParticipantID); b.Property(x => x.ExternalName).HasMaxLength(150); b.Property(x => x.ExternalEmail).HasMaxLength(256); b.HasOne(x => x.CRMActivity).WithMany(x => x.Participants).HasForeignKey(x => x.CRMActivityID).OnDelete(DeleteBehavior.Cascade); b.HasOne(x => x.Employee).WithMany().HasForeignKey(x => x.EmployeeID).OnDelete(DeleteBehavior.Restrict); b.HasOne(x => x.ClientContact).WithMany().HasForeignKey(x => x.ClientContactID).OnDelete(DeleteBehavior.Restrict); } }

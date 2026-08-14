@@ -1,0 +1,120 @@
+<app-page-header
+  eyebrow="Orders"
+  title="MT purchase order details"
+  subtitle="Complete line mapping, submission, and verification before conversion."
+/>
+@if (loading()) {
+  <app-loading-panel message="Loading purchase order details..." />
+} @else if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (success()) {
+  <div class="alert success">{{ success() }}</div>
+}
+@if (item(); as po) {
+  <section class="section-card">
+    <div class="section-heading">
+      <div>
+        <h2>{{ po.poNumber }}</h2>
+        <p>Client #{{ po.clientID }} · Received {{ po.receivedDate | date: 'mediumDate' }}</p>
+      </div>
+      <app-status-badge [label]="label(po.status)" [tone]="tone(po.status)" />
+    </div>
+    <div class="metrics">
+      <div class="metric">
+        <span>PO date</span><strong>{{ po.poDate | date: 'mediumDate' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Verification</span><strong>{{ po.verificationStatus }}</strong>
+      </div>
+      <div class="metric">
+        <span>Completeness</span><strong>{{ po.completenessStatus }}</strong>
+      </div>
+      <div class="metric">
+        <span>Requested delivery</span
+        ><strong>{{
+          po.requestedDeliveryDate ? (po.requestedDeliveryDate | date: 'mediumDate') : '—'
+        }}</strong>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>External item</th>
+            <th>Current SKU</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Discount</th>
+            <th>Map SKU</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of po.items; track line.modernTradePurchaseOrderItemID) {
+            <tr>
+              <td>
+                {{ line.externalItemCode || '—' }}<br /><small>{{ line.externalItemName }}</small>
+              </td>
+              <td>{{ line.skuCode || 'Unmapped' }}</td>
+              <td>{{ line.orderedQuantity }}</td>
+              <td>{{ line.agreedUnitPrice ?? '—' }}</td>
+              <td>{{ line.discount ?? '—' }}</td>
+              <td>
+                <select
+                  #skuSelect
+                  [value]="line.skuID || ''"
+                  (change)="map(line.modernTradePurchaseOrderItemID, skuSelect.value)"
+                >
+                  <option value="">Select SKU</option>
+                  @for (sku of skus(); track sku.skuID) {
+                    <option [value]="sku.skuID">{{ sku.skuCode }} - {{ sku.skuName }}</option>
+                  }
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (po.status === 1) {
+      <div class="actions">
+        <button type="button" (click)="submit()">Submit for verification</button>
+      </div>
+    }
+    @if (po.status === 2) {
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Verified by</label
+          ><select [(ngModel)]="verifyEmployeeID">
+            <option [ngValue]="0">Select employee</option>
+            @for (employee of employees(); track employee.employeeID) {
+              <option [ngValue]="employee.employeeID">
+                {{ employee.userFullName || employee.employeeCode }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Verification note</label><input [(ngModel)]="verificationNote" />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Rejection reason</label><input [(ngModel)]="rejectionReason" />
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" (click)="verify(true)">Verify</button
+        ><button type="button" class="danger" (click)="verify(false)">Reject</button>
+      </div>
+    }
+    @if (po.status === 3) {
+      <div class="actions">
+        <a
+          class="button"
+          [routerLink]="['/orders/new']"
+          [queryParams]="{ mode: 'mt', mtPurchaseOrderID: po.modernTradePurchaseOrderID }"
+          >Convert to order</a
+        >
+      </div>
+    }
+  </section>
+}

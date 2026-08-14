@@ -1,0 +1,43 @@
+@use '../../../../styles/feature-page' as feature;
+@include feature.page;
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--msx-space-4);
+}
+.quick-link-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--msx-space-4);
+}
+.quick-link {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid var(--msx-border-color);
+  border-radius: var(--msx-radius-md);
+  color: inherit;
+  padding: var(--msx-space-4);
+  text-decoration: none;
+}
+.quick-link:hover {
+  border-color: var(--msx-color-brand-500);
+  background: var(--msx-color-brand-50);
+}
+.quick-link span {
+  color: var(--msx-text-secondary);
+  font-size: 0.86rem;
+}
+@media (max-width: 1000px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .quick-link-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 620px) {
+  .metrics-grid,
+  .quick-link-grid {
+    grid-template-columns: 1fr;
+  }
+}

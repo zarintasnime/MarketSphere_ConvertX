@@ -1,0 +1,11 @@
+<div
+  class="loading-panel"
+  [class.loading-panel--compact]="compact"
+  [class.loading-panel--overlay]="overlay"
+  role="status"
+  aria-live="polite"
+  aria-busy="true"
+>
+  <span class="loading-panel__spinner" aria-hidden="true"></span>
+  <span class="loading-panel__message">{{ message }}</span>
+</div>

@@ -1,0 +1,189 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    title="Tasks"
+    subtitle="Track assigned actions, reminders, overdue work, and completion status."
+    [primaryActionLabel]="canManage() ? 'Create task' : ''"
+    (primaryAction)="openCreate()"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label>Search</label
+        ><input class="msx-input" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+      </div>
+      <div class="form-field">
+        <label>Assigned employee ID</label
+        ><input
+          type="number"
+          min="1"
+          class="msx-input"
+          [ngModel]="assignedEmployeeID()"
+          (ngModelChange)="assignedEmployeeID.set($event || null)"
+        />
+      </div>
+      <label class="checkbox-field"
+        ><input
+          type="checkbox"
+          [ngModel]="overdueOnly()"
+          (ngModelChange)="overdueOnly.set($event)"
+        />
+        Overdue only</label
+      ><button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Apply
+      </button>
+    </div>
+  </div>
+  @if (editorOpen()) {
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>{{ editingID() ? 'Edit task' : 'Create task' }}</h2>
+        <button type="button" class="msx-button msx-button--secondary" (click)="closeEditor()">
+          Close
+        </button>
+      </div>
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label>Title</label><input class="msx-input" formControlName="title" />
+        </div>
+        <div class="form-field">
+          <label>Assigned employee ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="assignedEmployeeID" />
+        </div>
+        <div class="form-field">
+          <label>Priority</label
+          ><select class="msx-input" formControlName="priority">
+            @for (option of priorityOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Due at</label
+          ><input type="datetime-local" class="msx-input" formControlName="dueAt" />
+        </div>
+        <div class="form-field">
+          <label>Reminder at</label
+          ><input type="datetime-local" class="msx-input" formControlName="reminderAt" />
+        </div>
+        <div class="form-field">
+          <label>Recurrence rule</label
+          ><input
+            class="msx-input"
+            formControlName="recurrenceRule"
+            placeholder="Optional RFC-style rule"
+          />
+        </div>
+        <div class="form-field">
+          <label>Lead ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="leadID" />
+        </div>
+        <div class="form-field">
+          <label>Client ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="clientID" />
+        </div>
+        <div class="form-field">
+          <label>Opportunity ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="opportunityID" />
+        </div>
+        <div class="form-field">
+          <label>Complaint ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="complaintID" />
+        </div>
+        <div class="form-field">
+          <label>Reactivation case ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="reactivationCaseID" />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Description</label
+          ><textarea rows="3" class="msx-input" formControlName="description"></textarea>
+        </div>
+        <div class="action-row form-field--full">
+          <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save task' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading tasks..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Employee</th>
+              <th>Priority</th>
+              <th>Due</th>
+              <th>Links</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.crmTaskID) {
+              <tr>
+                <td>
+                  <strong>{{ item.title }}</strong
+                  ><br /><span class="muted-text">{{ item.description || 'No description' }}</span>
+                </td>
+                <td>#{{ item.assignedEmployeeID }}</td>
+                <td>{{ priorityLabel(item.priority) }}</td>
+                <td>{{ item.dueAt | date: 'medium' }}</td>
+                <td>
+                  Lead {{ item.leadID ?? '—' }}, Client {{ item.clientID ?? '—' }}, Opportunity
+                  {{ item.opportunityID ?? '—' }}
+                </td>
+                <td>
+                  <app-status-badge
+                    [label]="statusLabel(item.status)"
+                    [tone]="statusTone(item.status)"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    @if (canManage()) {
+                      <button
+                        class="msx-button msx-button--secondary"
+                        type="button"
+                        (click)="edit(item)"
+                      >
+                        Edit
+                      </button>
+                      @if (item.status !== 3) {
+                        <button
+                          class="msx-button msx-button--secondary"
+                          type="button"
+                          (click)="changeStatus(item, 3)"
+                        >
+                          Complete
+                        </button>
+                      }
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No tasks were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

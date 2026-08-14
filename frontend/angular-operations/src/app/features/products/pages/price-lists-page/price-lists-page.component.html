@@ -1,0 +1,111 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Product and Pricing"
+    title="Price Lists"
+    subtitle="Maintain effective-dated prices by channel and client segment."
+    [primaryActionLabel]="canManage() ? 'Create price list' : ''"
+    (primaryAction)="router.navigate(['/products/price-lists/new'])"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="priceListSearch">Search</label
+        ><input
+          id="priceListSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Code or name"
+        />
+      </div>
+      <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading price lists..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Price List</th>
+              <th>Channel</th>
+              <th>Segment</th>
+              <th>Effective Period</th>
+              <th>Currency</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.priceListID) {
+              <tr>
+                <td>
+                  <strong>{{ item.priceListName }}</strong
+                  ><br /><span class="muted-text">{{ item.priceListCode }}</span>
+                </td>
+                <td>{{ channelLabel(item.channel) }}</td>
+                <td>{{ item.clientSegmentName || item.clientSegmentID || 'All segments' }}</td>
+                <td>{{ item.effectiveFrom }} to {{ item.effectiveTo || 'Open ended' }}</td>
+                <td>{{ item.currencyCode }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="statusLabel(item.status)"
+                    [tone]="statusTone(item.status)"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    <a
+                      class="msx-button msx-button--secondary"
+                      [routerLink]="['/products/price-lists', item.priceListID]"
+                      >Open</a
+                    >
+                    @if (canManage()) {
+                      @if (item.status !== 2) {
+                        <button
+                          type="button"
+                          class="msx-button msx-button--secondary"
+                          (click)="changeStatus(item, 2)"
+                        >
+                          Activate
+                        </button>
+                      }
+                      @if (item.status === 2) {
+                        <button
+                          type="button"
+                          class="msx-button msx-button--secondary"
+                          (click)="changeStatus(item, 3)"
+                        >
+                          Deactivate
+                        </button>
+                      }
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No price lists were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

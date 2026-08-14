@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarketSphere.Domain\MarketSphere.Domain.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.18" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <Folder Include="Common\DTOs\" />
+    <Folder Include="Common\Validation\" />
+    <Folder Include="Common\Security\" />
+    <Folder Include="Modules\CRM\DTOs\" />
+    <Folder Include="Modules\CRM\Interfaces\" />
+    <Folder Include="Modules\Infrastructure\DTOs\" />
+    <Folder Include="Modules\Infrastructure\Interfaces\" />
+    <Folder Include="Modules\Inventory\DTOs\" />
+    <Folder Include="Modules\Inventory\Interfaces\" />
+    <Folder Include="Modules\KPI\DTOs\" />
+    <Folder Include="Modules\KPI\Interfaces\" />
+    <Folder Include="Modules\OrderFulfilment\DTOs\" />
+    <Folder Include="Modules\OrderFulfilment\Interfaces\" />
+    <Folder Include="Modules\Procurement\DTOs\" />
+    <Folder Include="Modules\OrganizationSecurity\DTOs\" />
+    <Folder Include="Modules\OrganizationSecurity\Interfaces\" />
+    <Folder Include="Modules\Procurement\Interfaces\" />
+    <Folder Include="Modules\Procurement\Services\" />
+    <Folder Include="Modules\ProductPricing\DTOs\" />
+    <Folder Include="Modules\ProductPricing\Interfaces\" />
+  </ItemGroup>
+
+</Project>

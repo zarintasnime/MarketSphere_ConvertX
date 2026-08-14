@@ -1,0 +1,125 @@
+<app-page-header
+  eyebrow="Approvals"
+  title="Approval queue"
+  subtitle="Review order, credit, discount, return, inventory, and procurement approval requests."
+/>
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (success()) {
+  <div class="alert success">{{ success() }}</div>
+}
+<section class="section-card">
+  <div class="filters">
+    <input
+      [(ngModel)]="search"
+      placeholder="Search by reference type or ID"
+      (keyup.enter)="load(1)"
+    /><button type="button" (click)="load(1)">Search</button>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading approval queue..." />
+  } @else if (!rows().length) {
+    <app-empty-state title="No approval requests found" />
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Request</th>
+            <th>Reference</th>
+            <th>Type</th>
+            <th>Requested</th>
+            <th>Step</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of rows(); track item.approvalRequestID) {
+            <tr>
+              <td>#{{ item.approvalRequestID }}</td>
+              <td>{{ item.referenceType }} #{{ item.referenceID }}</td>
+              <td>{{ typeLabel(item.approvalType) }}</td>
+              <td>{{ item.requestedAt | date: 'medium' }}</td>
+              <td>{{ item.currentStepNo }}</td>
+              <td>
+                <app-status-badge [label]="statusLabel(item.status)" [tone]="tone(item.status)" />
+              </td>
+              <td>
+                <button type="button" class="link" (click)="open(item.approvalRequestID)">
+                  Open
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination
+      [pageNumber]="pageNumber"
+      [pageSize]="pageSize"
+      [totalCount]="totalCount()"
+      [totalPages]="totalPages()"
+      (pageChange)="load($event)"
+    />
+  }
+</section>
+@if (selected(); as item) {
+  <section class="section-card">
+    <div class="section-heading">
+      <div>
+        <h2>Approval request #{{ item.approvalRequestID }}</h2>
+        <p>
+          {{ item.referenceType }} #{{ item.referenceID }} · Policy #{{ item.approvalPolicyID }}
+        </p>
+      </div>
+      <app-status-badge [label]="statusLabel(item.status)" [tone]="tone(item.status)" />
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Action</th>
+            <th>By</th>
+            <th>At</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (action of item.actions; track action.approvalActionID) {
+            <tr>
+              <td>{{ action.stepNo }}</td>
+              <td>{{ actionLabel(action.action) }}</td>
+              <td>{{ action.actionByName }}</td>
+              <td>{{ action.actionAt | date: 'medium' }}</td>
+              <td>{{ action.note || '—' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-row">No action history.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="form-grid">
+      <div class="form-field form-field--full">
+        <label>Action note</label><textarea rows="3" [(ngModel)]="note"></textarea>
+      </div>
+      <div class="form-field">
+        <label>Delegate to user ID</label><input type="number" [(ngModel)]="delegateToUserID" />
+      </div>
+    </div>
+    @if (item.status === 1 || item.status === 2) {
+      <div class="actions">
+        <button type="button" (click)="act(2)">Approve</button
+        ><button type="button" class="danger" (click)="act(3)">Reject</button
+        ><button type="button" class="secondary" (click)="act(6)">Comment</button
+        ><button type="button" class="warning" (click)="act(5)">Delegate</button
+        ><button type="button" class="danger" (click)="cancel()">Cancel request</button>
+      </div>
+    }
+  </section>
+}

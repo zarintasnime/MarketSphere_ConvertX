@@ -1,0 +1,109 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Product and Pricing"
+    title="Products"
+    subtitle="Maintain sellable products and their operational rules."
+    [primaryActionLabel]="canManage() ? 'Create product' : ''"
+    (primaryAction)="router.navigate(['/products/new'])"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="productSearch">Search</label
+        ><input
+          id="productSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Code, name, category, or brand"
+        />
+      </div>
+      <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading products..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Brand</th>
+              <th>Type</th>
+              <th>Controls</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.productID) {
+              <tr>
+                <td>
+                  <strong>{{ item.productName }}</strong
+                  ><br /><span class="muted-text">{{ item.productCode }}</span>
+                </td>
+                <td>{{ item.categoryName }}</td>
+                <td>{{ item.brandName }}</td>
+                <td>{{ typeLabel(item.productType) }}</td>
+                <td>
+                  {{ item.requiresBatch ? 'Batch' : 'No batch' }} /
+                  {{ item.requiresExpiryDate ? 'Expiry' : 'No expiry' }}
+                </td>
+                <td>
+                  <app-status-badge
+                    [label]="item.isActive ? 'Active' : 'Inactive'"
+                    [tone]="item.isActive ? 'success' : 'neutral'"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    <a
+                      class="msx-button msx-button--secondary"
+                      [routerLink]="['/products', item.productID, 'edit']"
+                      >View</a
+                    >
+                    @if (canManage()) {
+                      <button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="edit(item)"
+                      >
+                        Edit</button
+                      ><button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="toggleStatus(item)"
+                      >
+                        {{ item.isActive ? 'Deactivate' : 'Activate' }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No products were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

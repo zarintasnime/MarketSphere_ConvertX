@@ -1,0 +1,132 @@
+:host {
+  display: block;
+}
+.field-page {
+  display: grid;
+  gap: 1rem;
+}
+.field-page__heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.field-page__heading h1 {
+  margin: 0;
+  color: #17335c;
+  font-size: 1.45rem;
+}
+.field-page__heading p {
+  margin: 0.3rem 0 0;
+  color: #64748b;
+}
+.field-card {
+  padding: 1rem;
+  border: 1px solid #dce4ee;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 8px 22px rgb(15 23 42 / 0.06);
+}
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+.field-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.field-metric {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem;
+  border-radius: 0.85rem;
+  background: #f1f6fc;
+}
+.field-metric span {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+.field-metric strong {
+  color: #17335c;
+  font-size: 1.35rem;
+}
+.field-list {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.field-list li {
+  padding: 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  background: #fff;
+}
+.field-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.field-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.7rem;
+  padding: 0.65rem 0.9rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: #fff;
+  background: #1f58a8;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+.field-button--secondary {
+  color: #17335c;
+  background: #eaf1fb;
+}
+.field-button--danger {
+  background: #b42318;
+}
+.field-input {
+  width: 100%;
+  min-height: 2.7rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.7rem;
+  background: #fff;
+}
+.field-control {
+  display: grid;
+  gap: 0.35rem;
+}
+.field-control label {
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.field-error {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.7rem;
+  color: #b42318;
+  background: #fff1f0;
+}
+.field-success {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.7rem;
+  color: #067647;
+  background: #ecfdf3;
+}
+@media (max-width: 560px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+  .field-page__heading {
+    display: grid;
+  }
+}

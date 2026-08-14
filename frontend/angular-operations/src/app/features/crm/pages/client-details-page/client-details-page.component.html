@@ -1,0 +1,279 @@
+<section class="feature-page">
+  @if (loading()) {
+    <app-loading-panel message="Loading client details..." />
+  } @else if (client(); as item) {
+    <app-page-header
+      eyebrow="CRM"
+      [title]="item.clientName"
+      [subtitle]="
+        item.clientCode +
+        ' · ' +
+        clientTypeLabel(item.clientType) +
+        ' · ' +
+        channelLabel(item.channel)
+      "
+      [primaryActionLabel]="canManage() ? 'Edit client' : ''"
+      secondaryActionLabel="Back to clients"
+      (primaryAction)="router.navigate(['/crm/clients', item.clientID, 'edit'])"
+      (secondaryAction)="router.navigate(['/crm/clients'])"
+    />
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    <div class="feature-grid">
+      <div class="feature-card feature-card--half">
+        <h2>Commercial Profile</h2>
+        <p>{{ item.address }}</p>
+        <p>
+          <strong>Phone:</strong> {{ item.phone || 'Not provided' }}<br /><strong>Email:</strong>
+          {{ item.email || 'Not provided' }}<br /><strong>Lifecycle:</strong>
+          {{ lifecycleLabel(item.lifecycleStatus) }}<br /><strong>Risk:</strong>
+          {{ riskLabel(item.riskStatus) }}
+        </p>
+      </div>
+      <div class="feature-card feature-card--half">
+        <h2>Territory and Location</h2>
+        <p>
+          <strong>Region:</strong> {{ item.regionID ?? 'Not assigned' }}<br /><strong>Area:</strong>
+          {{ item.areaID ?? 'Not assigned' }}<br /><strong>Territory:</strong>
+          {{ item.territoryID ?? 'Not assigned' }}<br /><strong>GPS:</strong>
+          {{ item.gpsLat ?? '—' }}, {{ item.gpsLng ?? '—' }}
+        </p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>Contacts</h2>
+        <strong>{{ item.contacts.length }} contact(s)</strong>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Designation</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Flags</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (contact of item.contacts; track contact.clientContactID) {
+              <tr>
+                <td>{{ contact.contactName }}</td>
+                <td>{{ contact.designation || '—' }}</td>
+                <td>{{ contact.phone || '—' }}</td>
+                <td>{{ contact.email || '—' }}</td>
+                <td>
+                  {{ contact.isPrimary ? 'Primary' : 'Additional' }} /
+                  {{ contact.isActive ? 'Active' : 'Inactive' }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-row">No contacts are recorded.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (canManage()) {
+        <form class="form-grid" [formGroup]="contactForm" (ngSubmit)="addContact()">
+          <div class="form-field">
+            <label>Contact name</label><input class="msx-input" formControlName="contactName" />
+          </div>
+          <div class="form-field">
+            <label>Designation</label><input class="msx-input" formControlName="designation" />
+          </div>
+          <div class="form-field">
+            <label>Phone</label><input class="msx-input" formControlName="phone" />
+          </div>
+          <div class="form-field">
+            <label>Email</label><input type="email" class="msx-input" formControlName="email" />
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isPrimary" /> Primary contact</label
+          ><label class="checkbox-field"
+            ><input type="checkbox" formControlName="isActive" /> Active</label
+          >
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--secondary" type="submit" [disabled]="busy()">
+              Add contact
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card feature-card--half">
+        <h2>Credit Profile</h2>
+        <form class="form-grid" [formGroup]="creditForm" (ngSubmit)="saveCredit()">
+          <div class="form-field">
+            <label>Credit limit</label
+            ><input
+              type="number"
+              min="0"
+              step="0.01"
+              class="msx-input"
+              formControlName="creditLimit"
+            />
+          </div>
+          <div class="form-field">
+            <label>Credit days</label
+            ><input type="number" min="0" class="msx-input" formControlName="creditDays" />
+          </div>
+          <div class="form-field">
+            <label>Current due</label
+            ><input
+              type="number"
+              min="0"
+              step="0.01"
+              class="msx-input"
+              formControlName="currentDue"
+            />
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isBlocked" /> Credit blocked</label
+          >
+          <div class="form-field form-field--full">
+            <label>Block reason</label><input class="msx-input" formControlName="blockReason" />
+          </div>
+          @if (canManageCredit()) {
+            <div class="action-row form-field--full">
+              <button type="submit" class="msx-button msx-button--secondary">
+                Save credit profile
+              </button>
+            </div>
+          }
+        </form>
+      </div>
+      <div class="feature-card feature-card--half">
+        <h2>Lifecycle</h2>
+        <form class="form-grid" [formGroup]="lifecycleForm" (ngSubmit)="changeLifecycle()">
+          <div class="form-field">
+            <label>Status</label
+            ><select class="msx-input" formControlName="lifecycleStatus">
+              @for (option of lifecycleOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field form-field--full">
+            <label>Reason</label
+            ><textarea class="msx-input" rows="3" formControlName="reason"></textarea>
+          </div>
+          @if (canManage()) {
+            <div class="action-row form-field--full">
+              <button type="submit" class="msx-button msx-button--secondary">
+                Change lifecycle
+              </button>
+            </div>
+          }
+        </form>
+      </div>
+    </div>
+    <div class="feature-card">
+      <h2>Client Segments</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Segment</th>
+              <th>Assigned</th>
+              <th>Effective To</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (segment of item.segments; track segment.clientSegmentAssignmentID) {
+              <tr>
+                <td>{{ segment.segmentName }} ({{ segment.segmentCode }})</td>
+                <td>{{ segment.assignedAt | date: 'medium' }}</td>
+                <td>
+                  {{ segment.effectiveTo ? (segment.effectiveTo | date: 'mediumDate') : 'Active' }}
+                </td>
+                <td>
+                  @if (canManage() && !segment.effectiveTo) {
+                    <button
+                      type="button"
+                      class="msx-button msx-button--secondary"
+                      (click)="endSegment(segment.clientSegmentAssignmentID)"
+                    >
+                      End now
+                    </button>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-row">No segment assignments are recorded.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (canManage()) {
+        <div class="feature-grid">
+          <form
+            class="feature-card feature-card--half form-grid"
+            [formGroup]="createSegmentForm"
+            (ngSubmit)="createSegment()"
+          >
+            <h3 class="form-field--full">Create segment</h3>
+            <div class="form-field">
+              <label>Code</label><input class="msx-input" formControlName="segmentCode" />
+            </div>
+            <div class="form-field">
+              <label>Name</label><input class="msx-input" formControlName="segmentName" />
+            </div>
+            <div class="form-field">
+              <label>Type value</label
+              ><input
+                type="number"
+                min="1"
+                max="5"
+                class="msx-input"
+                formControlName="segmentType"
+              />
+            </div>
+            <div class="form-field form-field--full">
+              <label>Description</label><input class="msx-input" formControlName="description" />
+            </div>
+            <label class="checkbox-field"
+              ><input type="checkbox" formControlName="isSystemSegment" /> System segment</label
+            ><label class="checkbox-field"
+              ><input type="checkbox" formControlName="isActive" /> Active</label
+            >
+            <div class="action-row form-field--full">
+              <button class="msx-button msx-button--secondary" type="submit">Create segment</button>
+            </div>
+          </form>
+          <form
+            class="feature-card feature-card--half form-grid"
+            [formGroup]="segmentForm"
+            (ngSubmit)="assignSegment()"
+          >
+            <h3 class="form-field--full">Assign segment</h3>
+            <div class="form-field">
+              <label>Segment ID</label
+              ><input type="number" min="1" class="msx-input" formControlName="clientSegmentID" />
+            </div>
+            <div class="form-field">
+              <label>Effective to</label
+              ><input type="datetime-local" class="msx-input" formControlName="effectiveTo" />
+            </div>
+            <div class="action-row form-field--full">
+              <button class="msx-button msx-button--secondary" type="submit">Assign segment</button>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() || 'Client could not be loaded.' }}</p>
+    </div>
+  }
+</section>

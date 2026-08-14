@@ -1,0 +1,27 @@
+<section class="empty-state" [class.empty-state--compact]="compact">
+  <div class="empty-state__icon" aria-hidden="true">
+    @switch (icon) {
+      @case ('search') {
+        <span>⌕</span>
+      }
+      @case ('warning') {
+        <span>!</span>
+      }
+      @case ('offline') {
+        <span>↯</span>
+      }
+      @default {
+        <span>□</span>
+      }
+    }
+  </div>
+
+  <h3>{{ title }}</h3>
+  <p>{{ message }}</p>
+
+  @if (actionLabel) {
+    <button type="button" class="msx-button msx-button--primary" (click)="requestAction()">
+      {{ actionLabel }}
+    </button>
+  }
+</section>

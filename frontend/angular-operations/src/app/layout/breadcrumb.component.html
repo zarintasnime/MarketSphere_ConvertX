@@ -1,0 +1,11 @@
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a routerLink="/dashboard">Home</a>
+  @for (segment of segments(); track segment.route; let last = $last) {
+    <span aria-hidden="true">/</span>
+    @if (last) {
+      <span aria-current="page">{{ segment.label }}</span>
+    } @else {
+      <a [routerLink]="segment.route">{{ segment.label }}</a>
+    }
+  }
+</nav>

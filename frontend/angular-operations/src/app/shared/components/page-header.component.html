@@ -1,0 +1,39 @@
+<header class="page-header">
+  <div class="page-header__content">
+    @if (eyebrow) {
+      <p class="page-header__eyebrow">{{ eyebrow }}</p>
+    }
+
+    <h1>{{ title }}</h1>
+
+    @if (subtitle) {
+      <p class="page-header__subtitle">{{ subtitle }}</p>
+    }
+  </div>
+
+  @if (hasActions) {
+    <div class="page-header__actions">
+      @if (secondaryActionLabel) {
+        <button
+          type="button"
+          class="msx-button msx-button--secondary"
+          [disabled]="secondaryActionDisabled"
+          (click)="secondaryAction.emit()"
+        >
+          {{ secondaryActionLabel }}
+        </button>
+      }
+
+      @if (primaryActionLabel) {
+        <button
+          type="button"
+          class="msx-button msx-button--primary"
+          [disabled]="primaryActionDisabled"
+          (click)="primaryAction.emit()"
+        >
+          {{ primaryActionLabel }}
+        </button>
+      }
+    </div>
+  }
+</header>

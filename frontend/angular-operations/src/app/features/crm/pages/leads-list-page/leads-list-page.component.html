@@ -1,0 +1,104 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    title="Leads"
+    subtitle="Manage prospect qualification, scoring, follow-up, and conversion."
+    [primaryActionLabel]="canManage() ? 'Create lead' : ''"
+    (primaryAction)="router.navigate(['/crm/leads/new'])"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="leadSearch">Search</label
+        ><input
+          id="leadSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Code, name, business, or phone"
+        />
+      </div>
+      <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading leads..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Lead</th>
+              <th>Source</th>
+              <th>Score</th>
+              <th>Temperature</th>
+              <th>Status</th>
+              <th>Next Follow-up</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.leadID) {
+              <tr>
+                <td>
+                  <strong>{{ item.leadName }}</strong
+                  ><br /><span class="muted-text"
+                    >{{ item.leadCode }} · {{ item.businessName || 'Individual' }}</span
+                  >
+                </td>
+                <td>{{ sourceLabel(item.source) }}</td>
+                <td>{{ item.currentScore }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="temperatureLabel(item.temperature)"
+                    [tone]="temperatureTone(item.temperature)"
+                  />
+                </td>
+                <td>{{ statusLabel(item.status) }}</td>
+                <td>
+                  {{
+                    item.nextFollowUpAt ? (item.nextFollowUpAt | date: 'medium') : 'Not scheduled'
+                  }}
+                </td>
+                <td>
+                  <div class="action-row">
+                    <a
+                      class="msx-button msx-button--secondary"
+                      [routerLink]="['/crm/leads', item.leadID]"
+                      >Open</a
+                    >
+                    @if (canManage()) {
+                      <a
+                        class="msx-button msx-button--secondary"
+                        [routerLink]="['/crm/leads', item.leadID, 'edit']"
+                        >Edit</a
+                      >
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No leads were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

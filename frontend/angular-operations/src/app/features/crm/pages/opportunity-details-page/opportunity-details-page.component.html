@@ -1,0 +1,201 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    [title]="isNew() ? 'Create Opportunity' : details()?.opportunityName || 'Opportunity Details'"
+    [subtitle]="
+      isNew() ? 'Create a qualified commercial opportunity.' : details()?.opportunityCode || ''
+    "
+    secondaryActionLabel="Back to opportunities"
+    (secondaryAction)="router.navigate(['/crm/opportunities'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading opportunity..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    <div class="feature-card">
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label>Opportunity code</label
+          ><input class="msx-input" formControlName="opportunityCode" />
+        </div>
+        <div class="form-field">
+          <label>Opportunity name</label
+          ><input class="msx-input" formControlName="opportunityName" />
+        </div>
+        <div class="form-field">
+          <label>Lead ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="leadID" />
+        </div>
+        <div class="form-field">
+          <label>Client ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="clientID" />
+        </div>
+        <div class="form-field">
+          <label>Campaign ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="campaignID" />
+        </div>
+        <div class="form-field">
+          <label>Owner employee ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="ownerEmployeeID" />
+        </div>
+        <div class="form-field">
+          <label>Expected value</label
+          ><input
+            type="number"
+            min="0"
+            step="0.01"
+            class="msx-input"
+            formControlName="expectedValue"
+          />
+        </div>
+        <div class="form-field">
+          <label>Probability %</label
+          ><input
+            type="number"
+            min="0"
+            max="100"
+            class="msx-input"
+            formControlName="probabilityPercent"
+          />
+        </div>
+        <div class="form-field">
+          <label>Expected close date</label
+          ><input type="date" class="msx-input" formControlName="expectedCloseDate" />
+        </div>
+        <div class="form-field">
+          <label>Competitor</label><input class="msx-input" formControlName="competitor" />
+        </div>
+        @if (canManage()) {
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+              {{ saving() ? 'Saving...' : 'Save opportunity' }}
+            </button>
+          </div>
+        }
+      </form>
+    </div>
+    @if (!isNew() && details(); as item) {
+      <div class="feature-grid">
+        <div class="feature-card feature-card--half">
+          <h2>Current Position</h2>
+          <p>
+            <strong>Stage:</strong> {{ stageLabel(item.stage) }}<br /><strong
+              >Expected value:</strong
+            >
+            {{ item.expectedValue | number: '1.2-2' }}<br /><strong>Probability:</strong>
+            {{ item.probabilityPercent }}%<br /><strong>Won at:</strong>
+            {{ item.wonAt ? (item.wonAt | date: 'medium') : 'Not won' }}
+          </p>
+        </div>
+        @if (canManage()) {
+          <form
+            class="feature-card feature-card--half form-grid"
+            [formGroup]="stageForm"
+            (ngSubmit)="changeStage()"
+          >
+            <h2 class="form-field--full">Change Stage</h2>
+            <div class="form-field">
+              <label>Stage</label
+              ><select class="msx-input" formControlName="stage">
+                @for (option of stageOptions; track option.value) {
+                  <option [ngValue]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field form-field--full">
+              <label>Lost reason</label><input class="msx-input" formControlName="lostReason" />
+            </div>
+            <div class="action-row form-field--full">
+              <button class="msx-button msx-button--secondary" type="submit">Update stage</button>
+            </div>
+          </form>
+        }
+      </div>
+      <div class="feature-card">
+        <h2>Activity Timeline</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (activity of activities(); track activity.crmActivityID) {
+                <tr>
+                  <td>{{ activity.activityAt | date: 'medium' }}</td>
+                  <td>{{ activityTypeLabel(activity.activityType) }}</td>
+                  <td>{{ activity.subject }}</td>
+                  <td>{{ activity.activityStatus }}</td>
+                  <td>{{ activity.outcome || '—' }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="empty-row">No activities are recorded.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (canManageActivities()) {
+          <form class="form-grid" [formGroup]="activityForm" (ngSubmit)="addActivity()">
+            <div class="form-field">
+              <label>Activity type</label
+              ><select class="msx-input" formControlName="activityType">
+                @for (option of activityTypeOptions; track option.value) {
+                  <option [ngValue]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Status</label
+              ><select class="msx-input" formControlName="activityStatus">
+                @for (option of activityStatusOptions; track option.value) {
+                  <option [ngValue]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Subject</label><input class="msx-input" formControlName="subject" />
+            </div>
+            <div class="form-field">
+              <label>Activity time</label
+              ><input type="datetime-local" class="msx-input" formControlName="activityAt" />
+            </div>
+            <div class="form-field form-field--full">
+              <label>Details</label
+              ><textarea rows="2" class="msx-input" formControlName="details"></textarea>
+            </div>
+            <div class="form-field">
+              <label>Outcome</label><input class="msx-input" formControlName="outcome" />
+            </div>
+            <div class="form-field">
+              <label>Next action</label
+              ><input type="datetime-local" class="msx-input" formControlName="nextActionAt" />
+            </div>
+            <div class="form-field">
+              <label>Performed by employee ID</label
+              ><input
+                type="number"
+                min="1"
+                class="msx-input"
+                formControlName="performedByEmployeeID"
+              />
+            </div>
+            <div class="action-row form-field--full">
+              <button class="msx-button msx-button--secondary" type="submit">Add activity</button>
+            </div>
+          </form>
+        }
+      </div>
+    }
+  }
+</section>

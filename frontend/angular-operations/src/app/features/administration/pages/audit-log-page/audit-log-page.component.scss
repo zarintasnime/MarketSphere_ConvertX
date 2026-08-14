@@ -1,0 +1,21 @@
+@use '../../../../styles/feature-page' as feature;
+@include feature.page;
+.audit-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--msx-space-4);
+}
+.audit-details pre {
+  max-height: 18rem;
+  overflow: auto;
+  border-radius: var(--msx-radius-md);
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: var(--msx-space-4);
+  white-space: pre-wrap;
+}
+@media (max-width: 800px) {
+  .audit-details {
+    grid-template-columns: 1fr;
+  }
+}

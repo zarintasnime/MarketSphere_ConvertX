@@ -1,0 +1,102 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Administration"
+    title="Users"
+    subtitle="Create users, review access, and control account status."
+    [primaryActionLabel]="canCreate() ? 'Create user' : ''"
+    (primaryAction)="router.navigate(['/administration/users/new'])"
+  />
+
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="userSearch">Search</label>
+        <input
+          id="userSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Name, email, or phone"
+        />
+      </div>
+      <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-panel message="Loading users..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Roles</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of result().items; track user.userID) {
+              <tr>
+                <td>
+                  <strong>{{ user.fullName }}</strong
+                  ><br /><span class="muted-text">{{ user.phone || 'No phone' }}</span>
+                </td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.roleCodes.join(', ') || 'No role' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="statusLabel(user.status)"
+                    [tone]="statusTone(user.status)"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    @if (canUpdate()) {
+                      <button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="edit(user)"
+                      >
+                        Edit
+                      </button>
+                    }
+                    @if (canChangeStatus()) {
+                      <button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="changeStatus(user)"
+                      >
+                        {{ user.status === 2 ? 'Disable' : 'Activate' }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-row">No users were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

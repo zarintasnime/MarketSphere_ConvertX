@@ -1,0 +1,79 @@
+<app-page-header
+  eyebrow="Inventory"
+  title="Stock balance"
+  subtitle="View warehouse, SKU, batch, reserved, quarantined, damaged, and available quantities."
+/>
+<section class="filter-bar multi">
+  <label
+    >Warehouse<select [(ngModel)]="warehouseID">
+      <option [ngValue]="null">All warehouses</option>
+      @for (item of warehouses(); track item.warehouseID) {
+        <option [ngValue]="item.warehouseID">{{ item.warehouseName }}</option>
+      }
+    </select></label
+  ><label
+    >SKU<select [(ngModel)]="skuID">
+      <option [ngValue]="null">All SKUs</option>
+      @for (item of skus(); track item.skuID) {
+        <option [ngValue]="item.skuID">{{ item.skuCode }} — {{ item.skuName }}</option>
+      }
+    </select></label
+  ><label>Batch ID<input type="number" [(ngModel)]="batchID" /></label
+  ><label class="checkbox"><input type="checkbox" [(ngModel)]="includeZero" /> Include zero</label
+  ><label class="checkbox"
+    ><input type="checkbox" [(ngModel)]="includeExpired" /> Include expired</label
+  ><button type="button" (click)="load()">Apply</button>
+</section>
+<div class="metrics">
+  <article>
+    <span>On hand</span><strong>{{ totals().onHand | number: '1.2-2' }}</strong>
+  </article>
+  <article>
+    <span>Reserved</span><strong>{{ totals().reserved | number: '1.2-2' }}</strong>
+  </article>
+  <article>
+    <span>Available</span><strong>{{ totals().available | number: '1.2-2' }}</strong>
+  </article>
+</div>
+@if (loading()) {
+  <app-loading-panel message="Loading stock balances..." />
+} @else if (error()) {
+  <div class="alert error">{{ error() }}</div>
+} @else if (!rows().length) {
+  <app-empty-state title="No stock balances found" />
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Warehouse</th>
+          <th>SKU</th>
+          <th>Batch</th>
+          <th>Expiry</th>
+          <th>On hand</th>
+          <th>Reserved</th>
+          <th>Quarantine</th>
+          <th>Damaged</th>
+          <th>Available</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of rows(); track item.stockBalanceID) {
+          <tr>
+            <td>{{ item.warehouseName }}</td>
+            <td>{{ item.skuCode }} — {{ item.skuName }}</td>
+            <td>{{ item.batchNo || '—' }}</td>
+            <td>{{ item.expiryDate ? (item.expiryDate | date: 'mediumDate') : '—' }}</td>
+            <td>{{ item.onHandQuantity | number: '1.2-2' }}</td>
+            <td>{{ item.reservedQuantity | number: '1.2-2' }}</td>
+            <td>{{ item.quarantineQuantity | number: '1.2-2' }}</td>
+            <td>{{ item.damagedQuantity | number: '1.2-2' }}</td>
+            <td>
+              <strong>{{ item.availableQuantity | number: '1.2-2' }}</strong>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

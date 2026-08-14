@@ -1,0 +1,91 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Marketing"
+    title="BP Sell-Out"
+    subtitle="Review promoter sell-out submissions and verify records used for KPI and incentive calculations."
+  />
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+  @if (canVerify()) {
+    <div class="feature-card">
+      <h2>Verify submission</h2>
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="verify()">
+        <div class="form-field">
+          <label>Record ID</label
+          ><input class="msx-input" type="number" formControlName="recordID" />
+        </div>
+        <div class="form-field">
+          <label>Decision</label
+          ><select class="msx-input" formControlName="verificationStatus">
+            <option [ngValue]="1">Verify</option>
+            <option [ngValue]="2">Reject</option>
+          </select>
+        </div>
+        <div class="form-field form-field--full">
+          <label>Note</label><textarea class="msx-input" formControlName="note"></textarea>
+        </div>
+        <button
+          class="msx-button msx-button--primary form-field--full"
+          type="submit"
+          [disabled]="saving()"
+        >
+          {{ saving() ? 'Submitting...' : 'Submit decision' }}
+        </button>
+      </form>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading sell-out records..." />
+  } @else {
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Date</th>
+              <th>Employee</th>
+              <th>Client</th>
+              <th>Visit</th>
+              <th>Quantity</th>
+              <th>Value</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.bpSellOutID) {
+              <tr>
+                <td>{{ item.bpSellOutID }}</td>
+                <td>{{ item.sellOutDate }}</td>
+                <td>{{ item.employeeID }}</td>
+                <td>{{ item.clientID }}</td>
+                <td>{{ item.visitID ?? 'N/A' }}</td>
+                <td>{{ item.totalQuantity }}</td>
+                <td>{{ item.totalValue.toFixed(2) }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="statusLabel(item.verificationStatus)"
+                    [tone]="
+                      item.verificationStatus === 1
+                        ? 'success'
+                        : item.verificationStatus === 2
+                          ? 'danger'
+                          : 'warning'
+                    "
+                  />
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">No sell-out records were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,53 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Administration"
+    [title]="'Permissions: ' + (role()?.roleName || 'Role')"
+    subtitle="Select the exact actions allowed for this role."
+    secondaryActionLabel="Back to roles"
+    (secondaryAction)="router.navigate(['/administration/roles'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading permission matrix..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="permission-grid">
+        @for (group of groups(); track group.moduleName) {
+          <section class="permission-group">
+            <label class="checkbox-field"
+              ><input
+                type="checkbox"
+                [checked]="isGroupSelected(group)"
+                (change)="toggleGroup(group, $any($event.target).checked)"
+              /><strong>{{ group.moduleName }}</strong></label
+            >
+            @for (permission of group.permissions; track permission.permissionID) {
+              <label class="checkbox-field"
+                ><input
+                  type="checkbox"
+                  [checked]="isSelected(permission.permissionID)"
+                  (change)="toggle(permission.permissionID, $any($event.target).checked)"
+                /><span
+                  >{{ permission.actionName
+                  }}<small class="muted-text">{{ permission.permissionCode }}</small></span
+                ></label
+              >
+            }
+          </section>
+        }
+      </div>
+      <div class="action-row">
+        <button
+          class="msx-button msx-button--primary"
+          type="button"
+          [disabled]="saving()"
+          (click)="save()"
+        >
+          {{ saving() ? 'Saving...' : 'Save permissions' }}
+        </button>
+      </div>
+    </div>
+  }
+</section>

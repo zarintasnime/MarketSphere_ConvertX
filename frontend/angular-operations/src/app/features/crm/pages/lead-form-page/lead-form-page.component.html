@@ -1,0 +1,84 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    [title]="isEdit() ? 'Edit Lead' : 'Create Lead'"
+    subtitle="Capture prospect information and the next follow-up commitment."
+    secondaryActionLabel="Back to leads"
+    (secondaryAction)="router.navigate(['/crm/leads'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading lead..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label>Lead code</label><input class="msx-input" formControlName="leadCode" />
+        </div>
+        <div class="form-field">
+          <label>Lead name</label><input class="msx-input" formControlName="leadName" />
+        </div>
+        <div class="form-field">
+          <label>Business name</label><input class="msx-input" formControlName="businessName" />
+        </div>
+        <div class="form-field">
+          <label>Source</label
+          ><select class="msx-input" formControlName="source">
+            @for (option of sourceOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Phone</label><input class="msx-input" formControlName="phone" />
+        </div>
+        <div class="form-field">
+          <label>Email</label><input type="email" class="msx-input" formControlName="email" />
+        </div>
+        <div class="form-field">
+          <label>Source campaign ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="sourceCampaignID" />
+        </div>
+        <div class="form-field">
+          <label>Assigned employee ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="assignedEmployeeID" />
+        </div>
+        <div class="form-field">
+          <label>Region ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="regionID" />
+        </div>
+        <div class="form-field">
+          <label>Estimated value</label
+          ><input
+            type="number"
+            min="0"
+            step="0.01"
+            class="msx-input"
+            formControlName="estimatedValue"
+          />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Product interest</label
+          ><textarea rows="3" class="msx-input" formControlName="productInterest"></textarea>
+        </div>
+        <div class="form-field">
+          <label>Next follow-up</label
+          ><input type="datetime-local" class="msx-input" formControlName="nextFollowUpAt" />
+        </div>
+        <div class="action-row form-field--full">
+          <button type="submit" class="msx-button msx-button--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save lead' }}</button
+          ><button
+            type="button"
+            class="msx-button msx-button--secondary"
+            (click)="router.navigate(['/crm/leads'])"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>

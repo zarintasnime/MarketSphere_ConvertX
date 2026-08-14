@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>MarketSphere.ConvertX.Api.Local</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.18" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.18">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarketSphere.Application\MarketSphere.Application.csproj" />
+    <ProjectReference Include="..\MarketSphere.Infrastructure\MarketSphere.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App_Data\Uploads\" />
+    <Folder Include="Authorization\" />
+    <Folder Include="Controllers\CRM\" />
+    <Folder Include="Controllers\Inventory\" />
+    <Folder Include="Controllers\KPI\" />
+    <Folder Include="Controllers\Infrastructure\" />
+    <Folder Include="Controllers\OrderFulfilment\" />
+    <Folder Include="Controllers\Procurement\" />
+    <Folder Include="Controllers\ProductPricing\" />
+    <Folder Include="Controllers\OrganizationSecurity\" />
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
+</Project>

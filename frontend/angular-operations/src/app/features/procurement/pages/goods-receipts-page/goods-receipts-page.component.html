@@ -1,0 +1,73 @@
+<app-page-header
+  eyebrow="Procurement"
+  title="Goods receipts"
+  subtitle="Receive approved purchase orders, complete quality checks, and post stock."
+  primaryActionLabel="New goods receipt"
+  (primaryAction)="newLink.click()"
+/><a #newLink class="visually-hidden" routerLink="/procurement/goods-receipts/new"
+  >New goods receipt</a
+>
+<section class="filter-bar">
+  <label>Search<input [(ngModel)]="search" (keyup.enter)="load(1)" /></label
+  ><button type="button" class="secondary" (click)="load(1)">Search</button>
+</section>
+@if (loading()) {
+  <app-loading-panel message="Loading goods receipts..." />
+} @else if (error()) {
+  <div class="alert error">{{ error() }}</div>
+} @else if (!rows().length) {
+  <app-empty-state title="No goods receipts found" />
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>GRN</th>
+          <th>Purchase order</th>
+          <th>Warehouse</th>
+          <th>Received</th>
+          <th>Quality</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of rows(); track item.goodsReceiptID) {
+          <tr>
+            <td>{{ item.goodsReceiptNo }}</td>
+            <td>{{ item.purchaseOrderNo }}</td>
+            <td>{{ item.warehouseName }}</td>
+            <td>{{ item.receivedDate | date: 'mediumDate' }}</td>
+            <td>{{ qualityLabel(item.qualityCheckStatus) }}</td>
+            <td>
+              <app-status-badge [label]="statusLabel(item.status)" [tone]="tone(item.status)" />
+            </td>
+            <td class="actions">
+              <a [routerLink]="['/procurement/goods-receipts', item.goodsReceiptID, 'edit']"
+                >Open</a
+              >
+              @if (item.qualityCheckStatus === 1 && item.status !== 5) {
+                <button type="button" class="link" (click)="qualityCheck(item.goodsReceiptID)">
+                  Quality check
+                </button>
+              }
+              @if (
+                (item.qualityCheckStatus === 2 || item.qualityCheckStatus === 3) &&
+                item.status !== 5
+              ) {
+                <button type="button" class="link" (click)="post(item.goodsReceiptID)">Post</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <app-pagination
+    [pageNumber]="pageNumber"
+    [pageSize]="pageSize"
+    [totalCount]="totalCount()"
+    [totalPages]="totalPages()"
+    (pageChange)="load($event)"
+  />
+}

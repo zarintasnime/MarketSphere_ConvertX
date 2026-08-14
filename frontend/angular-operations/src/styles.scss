@@ -1,0 +1,316 @@
+:root {
+  --msx-font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  --msx-page-background: #f4f7fb;
+  --msx-surface: #ffffff;
+  --msx-surface-muted: #f8fafc;
+  --msx-text-primary: #182538;
+  --msx-text-secondary: #5b6b80;
+  --msx-text-muted: #7f8da1;
+  --msx-border-color: #dce4ee;
+  --border-color: var(--msx-border-color);
+  --msx-color-brand-50: #eef5ff;
+  --msx-color-brand-100: #d8e8ff;
+  --msx-color-brand-500: #337fd8;
+  --msx-color-brand-600: #1f6ff2;
+  --msx-color-brand-700: #1f58a8;
+  --msx-color-brand-800: #174a8b;
+  /* Backward-compatible aliases used by some feature styles. */
+  --msx-color-primary-500: var(--msx-color-brand-500);
+  --msx-color-primary-600: var(--msx-color-brand-600);
+  --msx-color-primary-700: var(--msx-color-brand-700);
+  --msx-color-primary-800: var(--msx-color-brand-800);
+  --msx-color-danger-50: #fff1f2;
+  --msx-color-danger-600: #dc2626;
+  --msx-color-danger-700: #b42318;
+  --msx-color-success-50: #ecfdf3;
+  --msx-color-success-700: #087a48;
+  --msx-color-warning-50: #fff8e8;
+  --msx-color-warning-700: #9a6700;
+  --msx-color-neutral-0: #ffffff;
+  --msx-radius-md: 0.7rem;
+  --msx-radius-lg: 1rem;
+  --msx-radius-xl: 1.3rem;
+  --msx-radius-pill: 999px;
+  --msx-shadow-sm: 0 6px 18px rgb(15 23 42 / 6%);
+  --msx-shadow-lg: 0 24px 70px rgb(15 23 42 / 22%);
+  --msx-space-2: 0.5rem;
+  --msx-space-3: 0.75rem;
+  --msx-space-4: 1rem;
+  --msx-space-5: 1.25rem;
+  --msx-space-6: 1.5rem;
+  --msx-space-8: 2rem;
+  --msx-content-width: 1540px;
+  --msx-control-height: 2.65rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--msx-page-background);
+  color-scheme: light;
+  font-family: var(--msx-font-family);
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--msx-page-background);
+  color: var(--msx-text-primary);
+  font-family: var(--msx-font-family);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--msx-text-primary);
+  line-height: 1.2;
+}
+
+a {
+  color: var(--msx-color-brand-700);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 3px solid rgb(51 140 255 / 34%);
+  outline-offset: 2px;
+}
+
+.msx-page {
+  width: min(100% - 2rem, var(--msx-content-width));
+  margin-inline: auto;
+  padding-block: var(--msx-space-6);
+}
+
+.msx-card {
+  min-width: 0;
+  border: 1px solid var(--msx-border-color);
+  border-radius: var(--msx-radius-lg);
+  background: var(--msx-surface);
+  box-shadow: var(--msx-shadow-sm);
+}
+
+.msx-card__body {
+  min-width: 0;
+  padding: var(--msx-space-5);
+}
+
+.msx-button {
+  display: inline-flex;
+  min-height: var(--msx-control-height);
+  align-items: center;
+  justify-content: center;
+  gap: var(--msx-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--msx-radius-md);
+  padding: 0.625rem 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.msx-button--primary {
+  background: var(--msx-color-brand-600);
+  color: #fff;
+}
+
+.msx-button--secondary {
+  border-color: var(--msx-border-color);
+  background: var(--msx-surface);
+  color: var(--msx-text-primary);
+}
+
+.msx-button--danger {
+  background: var(--msx-color-danger-600);
+  color: #fff;
+}
+
+.msx-button:disabled {
+  opacity: 0.58;
+}
+
+.msx-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.msx-form-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.msx-field {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.msx-field > span,
+.msx-field > label {
+  color: var(--msx-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.msx-field input,
+.msx-field select,
+.msx-field textarea,
+input.msx-control,
+select.msx-control,
+textarea.msx-control {
+  width: 100%;
+  min-height: var(--msx-control-height);
+  border: 1px solid var(--msx-border-color);
+  border-radius: var(--msx-radius-md);
+  background: var(--msx-surface);
+  color: var(--msx-text-primary);
+  padding: 0.65rem 0.75rem;
+}
+
+textarea.msx-control,
+.msx-field textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.ng-invalid.ng-touched:not(form),
+.ng-invalid.ng-dirty:not(form) {
+  border-color: var(--msx-color-danger-600) !important;
+}
+
+.msx-form-error {
+  margin: 0;
+  color: var(--msx-color-danger-700);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.msx-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.msx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+@media (max-width: 900px) {
+  .msx-form-grid,
+  .msx-form-grid--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .msx-page {
+    width: min(100% - 1rem, var(--msx-content-width));
+    padding-block: var(--msx-space-4);
+  }
+
+  .msx-card__body {
+    padding: var(--msx-space-4);
+  }
+
+  .msx-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .msx-actions .msx-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  body {
+    font-size: 0.94rem;
+  }
+
+  .msx-card {
+    border-radius: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  button,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  .msx-card {
+    box-shadow: none;
+  }
+}

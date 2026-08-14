@@ -1,0 +1,36 @@
+MARKETSPHERE CONVERTX - START HERE
+
+This project does NOT require Docker.
+
+Prerequisites:
+  1. .NET 9 SDK
+  2. Microsoft SQL Server
+  3. Node.js 22 LTS + npm
+
+FIRST TIME ONLY:
+  1. Make sure SQL Server is running.
+  2. Double-click setup-local.cmd
+  3. Enter a local admin password when prompted.
+
+RUN THE PROJECT:
+  Double-click start-local.cmd
+
+URLs:
+  Swagger/API: http://localhost:5080/swagger
+  Angular Operations: http://localhost:4200
+  React Management: http://localhost:5173
+
+Login:
+  Email: admin@marketsphere.local
+  Password: the password entered in setup-local.cmd
+
+DATABASE:
+  In Development mode the backend automatically applies EF Core migrations
+  and runs the Bangladesh-localized seeders. You normally do NOT need to run
+  Update-Database manually.
+
+If your SQL Server instance is SQLEXPRESS, edit:
+  backend\MarketSphere.Api\appsettings.json
+Change Server=. to Server=.\SQLEXPRESS
+
+For detailed commands, read RUN_LOCAL.md.

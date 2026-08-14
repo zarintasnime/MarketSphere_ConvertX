@@ -1,0 +1,56 @@
+<app-page-header
+  eyebrow="Inventory"
+  title="Stock reservations"
+  subtitle="Inspect FEFO reservations created for approved order items."
+/>
+<section class="filter-bar">
+  <label>Order item ID<input type="number" min="1" placeholder="e.g. 1024" [(ngModel)]="orderItemID" /></label
+  ><button type="button" (click)="load()">Apply</button>
+</section>
+@if (loading()) {
+  <app-loading-panel message="Loading stock reservations..." />
+} @else if (error()) {
+  <div class="alert error">{{ error() }}</div>
+} @else if (!rows().length) {
+  <app-empty-state title="No stock reservations found" />
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Reservation</th>
+          <th>Order item</th>
+          <th>Warehouse</th>
+          <th>SKU</th>
+          <th>Batch</th>
+          <th>Quantity</th>
+          <th>Reserved</th>
+          <th>Expires</th>
+          <th>Released</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of rows(); track item.stockReservationID) {
+          <tr>
+            <td>#{{ item.stockReservationID }}</td>
+            <td>#{{ item.orderItemID }}</td>
+            <td><strong>{{ item.warehouseName }}</strong><small class="cell-meta">#{{ item.warehouseID }}</small></td>
+            <td><strong>{{ item.skuCode }}</strong><small class="cell-meta">{{ item.skuName }}</small></td>
+            <td>{{ item.batchNo || '—' }}</td>
+            <td>{{ item.reservedQuantity | number: '1.2-2' }}</td>
+            <td>{{ item.reservedAt | date: 'medium' }}</td>
+            <td>{{ item.expiresAt ? (item.expiresAt | date: 'medium') : '—' }}</td>
+            <td>{{ item.releasedAt ? (item.releasedAt | date: 'medium') : '—' }}</td>
+            <td>
+              <app-status-badge
+                [label]="label(item.reservationStatus)"
+                [tone]="tone(item.reservationStatus)"
+              />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

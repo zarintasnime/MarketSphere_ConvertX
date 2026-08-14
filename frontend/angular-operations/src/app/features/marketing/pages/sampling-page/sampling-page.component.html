@@ -1,0 +1,137 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Marketing"
+    title="Sampling Logs"
+    subtitle="Track sample issues, consumption, returns, damage, outcomes, and required follow-up."
+  />
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+  @if (canManage()) {
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>{{ editingID() ? 'Edit record' : 'Create record' }}</h2>
+        @if (editingID()) {
+          <button class="msx-button msx-button--secondary" type="button" (click)="reset()">
+            Cancel edit
+          </button>
+        }
+      </div>
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label>Visit ID</label><input class="msx-input" type="number" formControlName="visitID" />
+        </div>
+        <div class="form-field">
+          <label>Campaign ID</label
+          ><input class="msx-input" type="number" formControlName="campaignID" />
+        </div>
+        <div class="form-field">
+          <label>Client ID</label
+          ><input class="msx-input" type="number" formControlName="clientID" />
+        </div>
+        <div class="form-field">
+          <label>Employee ID</label
+          ><input class="msx-input" type="number" formControlName="employeeID" />
+        </div>
+        <div class="form-field">
+          <label>SKU ID</label><input class="msx-input" type="number" formControlName="skuID" />
+        </div>
+        <div class="form-field">
+          <label>Sample date</label
+          ><input class="msx-input" type="date" formControlName="sampleDate" />
+        </div>
+        <div class="form-field">
+          <label>Issued quantity</label
+          ><input class="msx-input" type="number" formControlName="issuedQuantity" />
+        </div>
+        <div class="form-field">
+          <label>Consumed quantity</label
+          ><input class="msx-input" type="number" formControlName="consumedQuantity" />
+        </div>
+        <div class="form-field">
+          <label>Returned quantity</label
+          ><input class="msx-input" type="number" formControlName="returnedQuantity" />
+        </div>
+        <div class="form-field">
+          <label>Damaged quantity</label
+          ><input class="msx-input" type="number" formControlName="damagedQuantity" />
+        </div>
+        <div class="form-field">
+          <label>Outcome</label><input class="msx-input" type="number" formControlName="outcome" />
+        </div>
+        <label class="checkbox-field"
+          ><input type="checkbox" formControlName="followUpRequired" /> Follow-up required</label
+        >
+        <div class="form-field form-field--full">
+          <label>Feedback summary</label
+          ><textarea class="msx-input" formControlName="feedbackSummary"></textarea>
+        </div>
+        <div class="action-row form-field--full">
+          <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save record' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading records..." />
+  } @else {
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Employee</th>
+              <th>SKU</th>
+              <th>Issued</th>
+              <th>Consumed</th>
+              <th>Returned</th>
+              <th>Outcome</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.samplingLogID) {
+              <tr>
+                <td>{{ item.sampleDate }}</td>
+                <td>{{ item.employeeID }}</td>
+                <td>{{ item.skuID }}</td>
+                <td>{{ item.issuedQuantity }}</td>
+                <td>{{ item.consumedQuantity }}</td>
+                <td>{{ item.returnedQuantity }}</td>
+                <td>{{ item.outcome }}</td>
+                <td>
+                  <div class="action-row">
+                    @if (canManage()) {
+                      <button
+                        class="msx-button msx-button--secondary"
+                        type="button"
+                        (click)="edit(item)"
+                      >
+                        Edit</button
+                      ><button
+                        class="msx-button msx-button--danger"
+                        type="button"
+                        (click)="remove(item)"
+                      >
+                        Delete
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">No records were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</section>

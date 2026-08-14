@@ -1,0 +1,38 @@
+@use '../../../../styles/feature-page' as feature;
+@include feature.page;
+.geo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--msx-space-4);
+}
+.entity-list {
+  display: grid;
+  gap: 0.45rem;
+  max-height: 16rem;
+  overflow: auto;
+  margin-bottom: var(--msx-space-4);
+}
+.entity-list__item {
+  display: grid;
+  border: 1px solid var(--msx-border-color);
+  border-radius: var(--msx-radius-md);
+  background: transparent;
+  padding: 0.65rem;
+  text-align: left;
+}
+.entity-list__item--active {
+  border-color: var(--msx-color-brand-500);
+  background: var(--msx-color-brand-50);
+}
+.entity-list small {
+  color: var(--msx-text-secondary);
+}
+form {
+  display: grid;
+  gap: var(--msx-space-3);
+}
+@media (max-width: 1100px) {
+  .geo-grid {
+    grid-template-columns: 1fr;
+  }
+}

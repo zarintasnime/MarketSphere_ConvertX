@@ -1,0 +1,69 @@
+:host {
+  display: block;
+}
+
+.loading-panel {
+  display: flex;
+  min-height: 14rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--msx-space-3);
+  border: 1px dashed var(--msx-border-color);
+  border-radius: var(--msx-radius-lg);
+  background: var(--msx-surface-muted);
+  color: var(--msx-text-secondary);
+  padding: var(--msx-space-6);
+  text-align: center;
+}
+
+.loading-panel--compact {
+  min-height: 7rem;
+}
+
+.loading-panel--overlay {
+  position: absolute;
+  z-index: 50;
+  inset: 0;
+  min-height: 100%;
+  border: 0;
+  background: rgb(255 255 255 / 82%);
+  backdrop-filter: blur(2px);
+}
+
+.loading-panel__spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  border: 3px solid var(--msx-color-brand-100);
+  border-top-color: var(--msx-color-brand-600);
+  border-radius: 50%;
+  animation: loading-panel-spin 700ms linear infinite;
+}
+
+.loading-panel__message {
+  font-weight: 700;
+}
+
+@keyframes loading-panel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .loading-panel {
+    min-height: 10rem;
+    flex-direction: column;
+    padding: var(--msx-space-4);
+  }
+
+  .loading-panel--compact {
+    min-height: 6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-panel__spinner {
+    animation-duration: 1.4s;
+  }
+}

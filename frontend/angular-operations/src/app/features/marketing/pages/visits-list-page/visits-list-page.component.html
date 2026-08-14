@@ -1,0 +1,86 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Marketing"
+    title="Field Visits"
+    subtitle="Review check-in, check-out, location quality, and visit completion status."
+  />
+  <div class="feature-card toolbar">
+    <form class="toolbar__search" (ngSubmit)="load(1)">
+      <input
+        class="msx-input"
+        name="search"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        placeholder="Search visits"
+      /><button class="msx-button msx-button--secondary" type="submit">Search</button>
+    </form>
+  </div>
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading visits..." />
+  } @else {
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Visit</th>
+              <th>Employee</th>
+              <th>Client</th>
+              <th>Type</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Location</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.visitID) {
+              <tr>
+                <td>
+                  <a [routerLink]="['/marketing/visits', item.visitID]">#{{ item.visitID }}</a>
+                </td>
+                <td>{{ item.employeeID }}</td>
+                <td>{{ item.clientID }}</td>
+                <td>{{ typeLabel(item.visitType) }}</td>
+                <td>{{ item.checkInAt }}</td>
+                <td>{{ item.checkOutAt || 'Active' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="item.isSuspiciousLocation ? 'Review' : 'Valid'"
+                    [tone]="item.isSuspiciousLocation ? 'warning' : 'success'"
+                  />
+                </td>
+                <td>{{ statusLabel(item.status) }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">No visits were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-row">
+        <button
+          class="msx-button msx-button--secondary"
+          [disabled]="result().pageNumber <= 1"
+          (click)="load(result().pageNumber - 1)"
+        >
+          Previous</button
+        ><span>Page {{ result().pageNumber }} of {{ result().totalPages || 1 }}</span
+        ><button
+          class="msx-button msx-button--secondary"
+          [disabled]="result().pageNumber >= result().totalPages"
+          (click)="load(result().pageNumber + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  }
+</section>

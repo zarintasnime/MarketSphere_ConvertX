@@ -1,0 +1,54 @@
+@use '../../../../styles/feature-page' as feature;
+@include feature.page;
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+.metric-grid > div {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem;
+  border-radius: 0.8rem;
+  background: #f5f8fc;
+}
+.metric-grid span {
+  color: #52657d;
+  font-size: 0.78rem;
+}
+.metric-grid strong {
+  font-size: 1.15rem;
+}
+.two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.record-list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.record-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border-radius: 0.65rem;
+  background: #f7f9fc;
+}
+.link-button {
+  border: 0;
+  color: #b42318;
+  background: none;
+  cursor: pointer;
+}
+@media (max-width: 760px) {
+  .metric-grid,
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MarketSphere.Domain.Entities.Infrastructure;
+namespace MarketSphere.Infrastructure.Persistence.Configurations.Infrastructure;
+public sealed class ApprovalActionConfiguration : IEntityTypeConfiguration<ApprovalAction> { public void Configure(EntityTypeBuilder<ApprovalAction> builder) { builder.ToTable("ApprovalActions"); builder.HasKey(x => x.ApprovalActionID); builder.Property(x => x.Action).HasConversion<int>(); builder.Property(x => x.Note).HasMaxLength(1000); builder.HasIndex(x => new { x.ApprovalRequestID, x.StepNo, x.ActionAt }); builder.HasOne(x => x.ApprovalRequest).WithMany(x => x.Actions).HasForeignKey(x => x.ApprovalRequestID).OnDelete(DeleteBehavior.Restrict); builder.HasOne(x => x.ActionByUser).WithMany().HasForeignKey(x => x.ActionByUserID).OnDelete(DeleteBehavior.Restrict); builder.HasOne(x => x.DelegatedFromUser).WithMany().HasForeignKey(x => x.DelegatedFromUserID).OnDelete(DeleteBehavior.Restrict); } }

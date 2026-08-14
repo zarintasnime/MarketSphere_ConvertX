@@ -1,0 +1,103 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    title="Complaints"
+    subtitle="Track customer issues, priority, ownership, SLA exposure, and resolution progress."
+    [primaryActionLabel]="canManage() ? 'Create complaint' : ''"
+    (primaryAction)="router.navigate(['/crm/complaints/new'])"
+  />
+
+  <div class="feature-card filter-bar">
+    <div class="form-field">
+      <label>Search</label
+      ><input
+        class="msx-input"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        (keyup.enter)="load(1)"
+        placeholder="Complaint number or subject"
+      />
+    </div>
+    <label class="checkbox-field"
+      ><input
+        type="checkbox"
+        [ngModel]="slaBreachedOnly()"
+        (ngModelChange)="slaBreachedOnly.set($event); load(1)"
+      />
+      SLA breached only</label
+    >
+    <button class="msx-button msx-button--secondary" type="button" (click)="load(1)">Apply</button>
+  </div>
+
+  @if (loading()) {
+    <app-loading-panel message="Loading complaints..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Complaint</th>
+              <th>Client</th>
+              <th>Category</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Opened</th>
+              <th>SLA Due</th>
+              <th>Owner</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.complaintID) {
+              <tr
+                class="clickable-row"
+                (click)="router.navigate(['/crm/complaints', item.complaintID])"
+              >
+                <td>
+                  <strong>{{ item.complaintNo }}</strong
+                  ><small>{{ item.subject }}</small>
+                </td>
+                <td>#{{ item.clientID }}</td>
+                <td>{{ categoryLabel(item.complaintCategory) }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="priorityLabel(item.priority)"
+                    [tone]="priorityTone(item.priority)"
+                  />
+                </td>
+                <td>
+                  <app-status-badge
+                    [label]="statusLabel(item.status)"
+                    [tone]="statusTone(item.status)"
+                  />
+                </td>
+                <td>{{ item.openedAt | date: 'medium' }}</td>
+                <td [class.danger-text]="isBreached(item)">
+                  {{ item.slaDueAt ? (item.slaDueAt | date: 'medium') : 'Not set' }}
+                </td>
+                <td>
+                  {{ item.assignedEmployeeID ? '#' + item.assignedEmployeeID : 'Unassigned' }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">No complaints matched the current filter.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

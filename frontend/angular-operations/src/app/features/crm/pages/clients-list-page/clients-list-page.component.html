@@ -1,0 +1,119 @@
+﻿<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    title="Clients"
+    subtitle="Manage active customers, lifecycle status, credit exposure, and client relationships."
+    [primaryActionLabel]="canManage() ? 'Create client' : ''"
+    (primaryAction)="router.navigate(['/crm/clients/new'])"
+  />
+  @if (dashboard(); as data) {
+    <div class="feature-grid">
+      <app-metric-card
+        label="Active clients"
+        [value]="data.summary.activeClients"
+      /><app-metric-card label="Open leads" [value]="data.summary.openLeads" /><app-metric-card
+        label="Pipeline value"
+        [value]="(data.summary.opportunityPipelineValue | number: '1.0-0') ?? '0'"
+      /><app-metric-card label="Open complaints" [value]="data.summary.openComplaints" />
+    </div>
+  }
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="clientSearch">Search</label
+        ><input
+          id="clientSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Code, name, or phone"
+        />
+      </div>
+      <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading clients..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Type / Channel</th>
+              <th>Phone</th>
+              <th>Lifecycle</th>
+              <th>Risk</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.clientID) {
+              <tr>
+                <td>
+                  <strong>{{ item.clientName }}</strong
+                  ><br /><span class="muted-text">{{ item.clientCode }}</span>
+                </td>
+                <td>
+                  {{ clientTypeLabel(item.clientType) }}<br /><span class="muted-text">{{
+                    channelLabel(item.channel)
+                  }}</span>
+                </td>
+                <td>{{ item.phone || 'No phone' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="lifecycleLabel(item.lifecycleStatus)"
+                    [tone]="lifecycleTone(item.lifecycleStatus)"
+                  />
+                </td>
+                <td>
+                  <app-status-badge
+                    [label]="riskLabel(item.riskStatus)"
+                    [tone]="riskTone(item.riskStatus)"
+                  />
+                </td>
+                <td>{{ item.isActive ? 'Active' : 'Inactive' }}</td>
+                <td>
+                  <div class="action-row">
+                    <a
+                      class="msx-button msx-button--secondary"
+                      [routerLink]="['/crm/clients', item.clientID]"
+                      >Open</a
+                    >
+                    @if (canManage()) {
+                      <a
+                        class="msx-button msx-button--secondary"
+                        [routerLink]="['/crm/clients', item.clientID, 'edit']"
+                        >Edit</a
+                      >
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No clients were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>
+

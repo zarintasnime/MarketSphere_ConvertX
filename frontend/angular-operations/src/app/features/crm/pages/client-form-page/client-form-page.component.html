@@ -1,0 +1,135 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    [title]="isEdit() ? 'Edit Client' : 'Create Client'"
+    subtitle="Capture the commercial profile and geographic assignment."
+    secondaryActionLabel="Back to clients"
+    (secondaryAction)="router.navigate(['/crm/clients'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading client..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label for="clientCode">Client code</label
+          ><input id="clientCode" class="msx-input" formControlName="clientCode" />
+        </div>
+        <div class="form-field">
+          <label for="clientName">Client name</label
+          ><input id="clientName" class="msx-input" formControlName="clientName" />
+        </div>
+        <div class="form-field">
+          <label for="clientType">Client type</label
+          ><select id="clientType" class="msx-input" formControlName="clientType">
+            @for (option of clientTypeOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="clientChannel">Channel</label
+          ><select id="clientChannel" class="msx-input" formControlName="channel">
+            @for (option of channelOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="clientPhone">Phone</label
+          ><input id="clientPhone" class="msx-input" formControlName="phone" />
+        </div>
+        <div class="form-field">
+          <label for="clientEmail">Email</label
+          ><input id="clientEmail" type="email" class="msx-input" formControlName="email" />
+        </div>
+        <div class="form-field form-field--full">
+          <label for="clientAddress">Address</label
+          ><textarea
+            id="clientAddress"
+            class="msx-input"
+            rows="3"
+            formControlName="address"
+          ></textarea>
+        </div>
+        <div class="form-field">
+          <label for="gpsLat">GPS latitude</label
+          ><input
+            id="gpsLat"
+            type="number"
+            step="0.000001"
+            class="msx-input"
+            formControlName="gpsLat"
+          />
+        </div>
+        <div class="form-field">
+          <label for="gpsLng">GPS longitude</label
+          ><input
+            id="gpsLng"
+            type="number"
+            step="0.000001"
+            class="msx-input"
+            formControlName="gpsLng"
+          />
+        </div>
+        <div class="form-field">
+          <label for="regionID">Region ID</label
+          ><input
+            id="regionID"
+            type="number"
+            min="1"
+            class="msx-input"
+            formControlName="regionID"
+          />
+        </div>
+        <div class="form-field">
+          <label for="areaID">Area ID</label
+          ><input id="areaID" type="number" min="1" class="msx-input" formControlName="areaID" />
+        </div>
+        <div class="form-field">
+          <label for="territoryID">Territory ID</label
+          ><input
+            id="territoryID"
+            type="number"
+            min="1"
+            class="msx-input"
+            formControlName="territoryID"
+          />
+        </div>
+        <div class="form-field">
+          <label for="lifecycle">Lifecycle</label
+          ><select id="lifecycle" class="msx-input" formControlName="lifecycleStatus">
+            @for (option of lifecycleOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="risk">Risk</label
+          ><select id="risk" class="msx-input" formControlName="riskStatus">
+            @for (option of riskOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <label class="checkbox-field"
+          ><input type="checkbox" formControlName="isActive" /> Active</label
+        >
+        <div class="action-row form-field--full">
+          <button type="submit" class="msx-button msx-button--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save client' }}</button
+          ><button
+            type="button"
+            class="msx-button msx-button--secondary"
+            (click)="router.navigate(['/crm/clients'])"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>

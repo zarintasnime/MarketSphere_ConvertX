@@ -1,0 +1,180 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    title="Client Reactivation"
+    subtitle="Manage inactive-client recovery assignments, outcomes, and repeat-order evidence."
+    [primaryActionLabel]="canManage() ? 'Open case' : ''"
+    (primaryAction)="createOpen.set(true)"
+  />
+  <div class="feature-card filter-bar">
+    <div class="form-field">
+      <label>Search</label
+      ><input
+        class="msx-input"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        (keyup.enter)="load(1)"
+        placeholder="Client, campaign, or employee"
+      />
+    </div>
+    <button class="msx-button msx-button--secondary" type="button" (click)="load(1)">Apply</button>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading reactivation cases..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Case</th>
+              <th>Client</th>
+              <th>Inactive Since</th>
+              <th>Assigned Employee</th>
+              <th>Status</th>
+              <th>Result</th>
+              <th>Opened</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.reactivationCaseID) {
+              <tr>
+                <td>
+                  #{{ item.reactivationCaseID
+                  }}<small>{{ item.churnReason || 'No churn reason' }}</small>
+                </td>
+                <td>#{{ item.clientID }}</td>
+                <td>{{ item.inactiveAt | date: 'mediumDate' }}</td>
+                <td>#{{ item.assignedEmployeeID }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="statusLabel(item.status)"
+                    [tone]="statusTone(item.status)"
+                  />
+                </td>
+                <td>{{ resultLabel(item.reactivationResult) }}</td>
+                <td>{{ item.openedAt | date: 'medium' }}</td>
+                <td>
+                  @if (canManage()) {
+                    <button
+                      class="msx-button msx-button--secondary"
+                      type="button"
+                      (click)="openResolve(item)"
+                    >
+                      Resolve
+                    </button>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">No reactivation cases were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+
+  @if (createOpen()) {
+    <div class="dialog-backdrop">
+      <div class="feature-card dialog-card">
+        <div class="feature-card__header">
+          <h2>Open Reactivation Case</h2>
+          <button type="button" class="icon-button" (click)="createOpen.set(false)">×</button>
+        </div>
+        <form class="form-grid" [formGroup]="createForm" (ngSubmit)="create()">
+          <div class="form-field">
+            <label>Client ID</label
+            ><input type="number" min="1" class="msx-input" formControlName="clientID" />
+          </div>
+          <div class="form-field">
+            <label>Inactive at</label
+            ><input type="datetime-local" class="msx-input" formControlName="inactiveAt" />
+          </div>
+          <div class="form-field">
+            <label>Assigned employee ID</label
+            ><input type="number" min="1" class="msx-input" formControlName="assignedEmployeeID" />
+          </div>
+          <div class="form-field">
+            <label>Campaign ID</label
+            ><input type="number" min="1" class="msx-input" formControlName="campaignID" />
+          </div>
+          <div class="form-field form-field--full">
+            <label>Churn reason</label
+            ><textarea rows="3" class="msx-input" formControlName="churnReason"></textarea>
+          </div>
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+              Create case</button
+            ><button
+              class="msx-button msx-button--secondary"
+              type="button"
+              (click)="createOpen.set(false)"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (resolvingCase(); as item) {
+    <div class="dialog-backdrop">
+      <div class="feature-card dialog-card">
+        <div class="feature-card__header">
+          <h2>Resolve Case #{{ item.reactivationCaseID }}</h2>
+          <button type="button" class="icon-button" (click)="resolvingCase.set(null)">×</button>
+        </div>
+        <form class="form-grid" [formGroup]="resolveForm" (ngSubmit)="resolve()">
+          <div class="form-field">
+            <label>Status</label
+            ><select class="msx-input" formControlName="status">
+              @for (option of statusOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Result</label
+            ><select class="msx-input" formControlName="reactivationResult">
+              <option [ngValue]="null">No result</option>
+              @for (option of resultOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Repeat order ID</label
+            ><input type="number" min="1" class="msx-input" formControlName="repeatOrderID" />
+          </div>
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+              Save resolution</button
+            ><button
+              class="msx-button msx-button--secondary"
+              type="button"
+              (click)="resolvingCase.set(null)"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,90 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Administration"
+    title="Employees"
+    subtitle="Maintain employee identity, hierarchy, and business access scope."
+    [primaryActionLabel]="canCreate() ? 'Create employee' : ''"
+    (primaryAction)="router.navigate(['/administration/employees/new'])"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="employeeSearch">Search</label
+        ><input
+          id="employeeSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Employee code, name, or branch"
+        />
+      </div>
+      <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading employees..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>User</th>
+              <th>Designation</th>
+              <th>Branch</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (employee of result().items; track employee.employeeID) {
+              <tr>
+                <td>
+                  <strong>{{ employee.employeeCode }}</strong>
+                </td>
+                <td>{{ employee.userFullName || 'Not linked' }}</td>
+                <td>{{ employee.designationName }}</td>
+                <td>{{ employee.branchName }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="statusLabel(employee.status)"
+                    [tone]="statusTone(employee.status)"
+                  />
+                </td>
+                <td>
+                  @if (canUpdate()) {
+                    <button
+                      class="msx-button msx-button--secondary"
+                      type="button"
+                      (click)="edit(employee)"
+                    >
+                      Edit
+                    </button>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-row">No employees were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

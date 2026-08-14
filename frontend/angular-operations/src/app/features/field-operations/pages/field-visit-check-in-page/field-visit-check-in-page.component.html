@@ -1,0 +1,58 @@
+<section class="field-page">
+  <div class="field-page__heading">
+    <div>
+      <h1>Visit Check-In</h1>
+      <p>Confirm the client, visit purpose, and current GPS location.</p>
+    </div>
+  </div>
+  @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+  }
+  <div class="field-card">
+    <form class="field-grid" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field-control">
+        <label>Client ID</label
+        ><input class="field-input" type="number" formControlName="clientID" />
+      </div>
+      <div class="field-control">
+        <label>Route ID</label><input class="field-input" type="number" formControlName="routeID" />
+      </div>
+      <div class="field-control">
+        <label>Campaign ID</label
+        ><input class="field-input" type="number" formControlName="campaignID" />
+      </div>
+      <div class="field-control">
+        <label>Visit type</label
+        ><select class="field-input" formControlName="visitType">
+          @for (option of visitTypes; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="field-control" style="grid-column: 1/-1">
+        <label>Note</label><textarea class="field-input" rows="3" formControlName="note"></textarea>
+      </div>
+      <div class="field-card" style="grid-column: 1/-1">
+        @if (locationData(); as gps) {
+          <p class="field-success">
+            Location captured: {{ gps.latitude.toFixed(6) }}, {{ gps.longitude.toFixed(6) }} |
+            Accuracy {{ gps.accuracyMeters ?? 'unknown' }} m
+          </p>
+        } @else {
+          <p>Location has not been captured.</p>
+        }
+        <button
+          class="field-button field-button--secondary"
+          type="button"
+          (click)="captureLocation()"
+          [disabled]="locating()"
+        >
+          {{ locating() ? 'Capturing...' : 'Capture location' }}
+        </button>
+      </div>
+      <button class="field-button" style="grid-column: 1/-1" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Checking in...' : 'Check in' }}
+      </button>
+    </form>
+  </div>
+</section>

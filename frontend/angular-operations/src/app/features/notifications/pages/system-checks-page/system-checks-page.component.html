@@ -1,0 +1,76 @@
+<app-page-header
+  eyebrow="Infrastructure"
+  title="System Checks"
+  subtitle="Run the localhost replacement for scheduled background checks and generate actionable in-app notifications."
+/>
+
+<section class="system-check-intro">
+  <div>
+    <h2>Manual business-rule scan</h2>
+    <p>
+      This action checks overdue CRM tasks, expiring quotations, complaint SLA breaches, near-expiry
+      batches, and inactive clients. Existing active unread alerts are not duplicated by the
+      backend.
+    </p>
+  </div>
+  <button type="button" [disabled]="running()" (click)="runChecks()">
+    {{ running() ? 'Running checks...' : 'Run system checks' }}
+  </button>
+</section>
+
+@if (errorMessage()) {
+  <p class="alert error">{{ errorMessage() }}</p>
+}
+@if (successMessage()) {
+  <p class="alert success">{{ successMessage() }}</p>
+}
+
+@if (running()) {
+  <app-loading-panel message="Checking business rules and creating notifications..." />
+}
+
+@if (lastRun(); as result) {
+  <section class="run-summary">
+    <article>
+      <span>Completed at</span>
+      <strong>{{ result.ranAt | date: 'medium' }}</strong>
+    </article>
+    <article>
+      <span>Matching records</span>
+      <strong>{{ totalMatches() }}</strong>
+    </article>
+    <article>
+      <span>New notifications</span>
+      <strong>{{ result.notificationsCreated }}</strong>
+    </article>
+  </section>
+
+  <section class="check-grid">
+    @for (item of result.results; track item.checkCode) {
+      <article class="check-card">
+        <div class="check-card__heading">
+          <div>
+            <span class="check-code">{{ item.checkCode }}</span>
+            <h2>{{ friendlyTitle(item.checkCode, item.title) }}</h2>
+          </div>
+          <app-status-badge
+            [label]="item.matchCount + ' matches'"
+            [tone]="resultTone(item.matchCount)"
+          />
+        </div>
+        <p>{{ description(item.checkCode) }}</p>
+        <small>{{ item.message }}</small>
+      </article>
+    } @empty {
+      <app-empty-state
+        title="No check results returned"
+        message="The backend completed the run but returned no individual check results."
+      />
+    }
+  </section>
+} @else if (!running()) {
+  <app-empty-state
+    title="No system-check run in this browser session"
+    message="Select Run system checks to evaluate the five configured localhost business rules."
+  />
+}

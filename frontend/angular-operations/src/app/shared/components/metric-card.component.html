@@ -1,0 +1,22 @@
+<article class="metric-card" [class]="'metric-card metric-card--' + tone">
+  <div class="metric-card__accent" aria-hidden="true"></div>
+
+  <div class="metric-card__content">
+    <p class="metric-card__label">{{ label }}</p>
+    <p class="metric-card__value">{{ value }}</p>
+
+    @if (trendValue) {
+      <p
+        class="metric-card__trend"
+        [class]="'metric-card__trend metric-card__trend--' + trendDirection"
+      >
+        <span aria-hidden="true">
+          {{ trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '•' }}
+        </span>
+        {{ trendValue }}
+      </p>
+    } @else if (hint) {
+      <p class="metric-card__hint">{{ hint }}</p>
+    }
+  </div>
+</article>

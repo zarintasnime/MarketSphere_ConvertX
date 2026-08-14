@@ -1,0 +1,112 @@
+<app-page-header
+  eyebrow="Fulfilment"
+  title="Pick lists"
+  subtitle="Release reserved order quantities to warehouse picking and verification."
+  primaryActionLabel="New pick list"
+  (primaryAction)="showCreate = !showCreate"
+/>
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (showCreate) {
+  <section class="section-card">
+    <form [formGroup]="form" (ngSubmit)="create()">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Pick list number</label><input formControlName="pickListNo" />
+        </div>
+        <div class="form-field">
+          <label>Order</label
+          ><select formControlName="orderID">
+            <option [ngValue]="0">Select order</option>
+            @for (order of orders(); track order.orderID) {
+              <option [ngValue]="order.orderID">
+                {{ order.orderNo }} · {{ order.clientName }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Invoice</label
+          ><select formControlName="invoiceID">
+            <option [ngValue]="null">No invoice</option>
+            @for (invoice of invoices(); track invoice.invoiceID) {
+              <option [ngValue]="invoice.invoiceID">{{ invoice.invoiceNo }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Warehouse</label
+          ><select formControlName="warehouseID">
+            <option [ngValue]="0">Select warehouse</option>
+            @for (warehouse of warehouses(); track warehouse.warehouseID) {
+              <option [ngValue]="warehouse.warehouseID">{{ warehouse.warehouseName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field"><label>Wave number</label><input formControlName="waveNo" /></div>
+        <div class="form-field form-field--full">
+          <label>Note</label><textarea rows="3" formControlName="note"></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit">Create pick list</button
+        ><button type="button" class="secondary" (click)="showCreate = false">Cancel</button>
+      </div>
+    </form>
+  </section>
+}
+<section class="section-card">
+  <div class="filters">
+    <input
+      [(ngModel)]="search"
+      placeholder="Search pick list number"
+      (keyup.enter)="load(1)"
+    /><button type="button" (click)="load(1)">Search</button>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading pick lists..." />
+  } @else if (!rows().length) {
+    <app-empty-state title="No pick lists found" />
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Pick list</th>
+            <th>Order</th>
+            <th>Invoice</th>
+            <th>Warehouse</th>
+            <th>Wave</th>
+            <th>Released</th>
+            <th>Verified</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of rows(); track item.pickListID) {
+            <tr>
+              <td>{{ item.pickListNo }}</td>
+              <td>#{{ item.orderID }}</td>
+              <td>{{ item.invoiceID || '—' }}</td>
+              <td>#{{ item.warehouseID }}</td>
+              <td>{{ item.waveNo || '—' }}</td>
+              <td>{{ item.releasedAt ? (item.releasedAt | date: 'short') : '—' }}</td>
+              <td>{{ item.verifiedAt ? (item.verifiedAt | date: 'short') : '—' }}</td>
+              <td><app-status-badge [label]="label(item.status)" [tone]="tone(item.status)" /></td>
+              <td><a [routerLink]="['/fulfilment/pick-lists', item.pickListID]">Open</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination
+      [pageNumber]="pageNumber"
+      [pageSize]="pageSize"
+      [totalCount]="totalCount()"
+      [totalPages]="totalPages()"
+      (pageChange)="load($event)"
+    />
+  }
+</section>

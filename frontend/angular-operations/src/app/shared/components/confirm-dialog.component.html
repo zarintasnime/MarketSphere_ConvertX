@@ -1,0 +1,47 @@
+@if (open) {
+  <div class="confirm-dialog__backdrop" role="presentation" (mousedown)="handleBackdrop($event)">
+    <section
+      class="confirm-dialog"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-message"
+    >
+      <header class="confirm-dialog__header">
+        <div
+          class="confirm-dialog__icon"
+          [class.confirm-dialog__icon--danger]="tone === 'danger'"
+          aria-hidden="true"
+        >
+          {{ tone === 'danger' ? '!' : '?' }}
+        </div>
+        <div>
+          <h2 id="confirm-dialog-title">{{ title }}</h2>
+          <p id="confirm-dialog-message">{{ message }}</p>
+        </div>
+      </header>
+
+      <footer class="confirm-dialog__actions">
+        <button
+          type="button"
+          class="msx-button msx-button--secondary"
+          [disabled]="busy"
+          (click)="cancel()"
+        >
+          {{ cancelText }}
+        </button>
+        <button
+          #confirmButton
+          type="button"
+          class="msx-button"
+          [class.msx-button--primary]="tone === 'primary'"
+          [class.msx-button--danger]="tone === 'danger'"
+          [disabled]="busy"
+          (click)="confirm()"
+        >
+          {{ busy ? 'Processing...' : confirmText }}
+        </button>
+      </footer>
+    </section>
+  </div>
+}

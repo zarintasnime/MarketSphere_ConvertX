@@ -1,0 +1,5 @@
+using MarketSphere.Domain.Entities.CRM;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+namespace MarketSphere.Infrastructure.Persistence.Configurations.CRM;
+public sealed class ClientSegmentAssignmentConfiguration : IEntityTypeConfiguration<ClientSegmentAssignment> { public void Configure(EntityTypeBuilder<ClientSegmentAssignment> b) { b.ToTable("ClientSegmentAssignments", t => t.HasCheckConstraint("CK_ClientSegmentAssignments_DateRange", "[EffectiveTo] IS NULL OR [EffectiveTo] >= [AssignedAt]")); b.HasKey(x => x.ClientSegmentAssignmentID); b.HasIndex(x => new { x.ClientID, x.ClientSegmentID }).HasFilter("[EffectiveTo] IS NULL").IsUnique(); b.HasOne(x => x.Client).WithMany(x => x.SegmentAssignments).HasForeignKey(x => x.ClientID).OnDelete(DeleteBehavior.Restrict); b.HasOne(x => x.ClientSegment).WithMany(x => x.Assignments).HasForeignKey(x => x.ClientSegmentID).OnDelete(DeleteBehavior.Restrict); b.HasOne(x => x.AssignedByUser).WithMany().HasForeignKey(x => x.AssignedByUserID).OnDelete(DeleteBehavior.Restrict); } }

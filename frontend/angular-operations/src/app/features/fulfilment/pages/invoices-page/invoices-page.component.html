@@ -1,0 +1,194 @@
+<app-page-header
+  eyebrow="Fulfilment"
+  title="Invoices"
+  subtitle="Create customer invoices from approved order quantities and monitor due balances."
+  primaryActionLabel="New invoice"
+  (primaryAction)="toggleCreateForm()"
+/>
+
+@if (error()) {
+  <div class="alert error">
+    {{ error() }}
+  </div>
+}
+
+@if (showCreate) {
+  <section class="section-card">
+    <form [formGroup]="form" (ngSubmit)="create()">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="invoiceNumber"> Invoice number </label>
+
+          <input id="invoiceNumber" class="msx-input" formControlName="invoiceNo" />
+        </div>
+
+        <div class="form-field">
+          <label for="invoiceOrder"> Order </label>
+
+          <select
+            id="invoiceOrder"
+            class="msx-input"
+            formControlName="orderID"
+            (change)="selectOrder($any($event.target).value)"
+          >
+            <option value="0">Select order</option>
+
+            @for (order of orders(); track order.orderID) {
+              <option [value]="order.orderID">
+                {{ order.orderNo }}
+                ·
+                {{ order.clientName }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="invoiceDate"> Invoice date </label>
+
+          <input id="invoiceDate" type="date" class="msx-input" formControlName="invoiceDate" />
+        </div>
+
+        <div class="form-field">
+          <label for="invoiceDueDate"> Due date </label>
+
+          <input id="invoiceDueDate" type="date" class="msx-input" formControlName="dueDate" />
+        </div>
+      </div>
+
+      @if (selectedOrder() && items.length > 0) {
+        <div class="table-wrap" formArrayName="items">
+          <table>
+            <thead>
+              <tr>
+                <th>Order item</th>
+                <th>SKU</th>
+                <th>Invoice quantity</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (group of items.controls; track $index) {
+                <tr [formGroupName]="$index">
+                  <td>
+                    {{ group.value.orderItemID }}
+                  </td>
+
+                  <td>
+                    {{ group.value.skuCode }}
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      class="msx-input"
+                      formControlName="quantity"
+                    />
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <div class="actions">
+        <button type="submit" class="msx-button msx-button--primary">Create invoice</button>
+
+        <button type="button" class="msx-button msx-button--secondary" (click)="cancelCreate()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </section>
+}
+
+<section class="section-card">
+  <div class="filters">
+    <input
+      class="msx-input"
+      [(ngModel)]="search"
+      placeholder="Search invoice number"
+      (keyup.enter)="load(1)"
+    />
+
+    <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">Search</button>
+  </div>
+
+  @if (loading()) {
+    <app-loading-panel message="Loading invoices..." />
+  } @else if (!rows().length) {
+    <app-empty-state title="No invoices found" />
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Order</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Due date</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Due</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of rows(); track item.invoiceID) {
+            <tr>
+              <td>
+                {{ item.invoiceNo }}
+              </td>
+
+              <td>#{{ item.orderID }}</td>
+
+              <td>#{{ item.clientID }}</td>
+
+              <td>
+                {{ item.invoiceDate | date: 'mediumDate' }}
+              </td>
+
+              <td>
+                {{ item.dueDate ? (item.dueDate | date: 'mediumDate') : '—' }}
+              </td>
+
+              <td>
+                {{ item.totalAmount | number: '1.2-2' }}
+              </td>
+
+              <td>
+                {{ item.paidAmount | number: '1.2-2' }}
+              </td>
+
+              <td>
+                {{ item.dueAmount | number: '1.2-2' }}
+              </td>
+
+              <td>
+                <app-status-badge [label]="label(item.status)" [tone]="tone(item.status)" />
+              </td>
+
+              <td>
+                <a [routerLink]="['/fulfilment/invoices', item.invoiceID]"> Open </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [pageNumber]="pageNumber"
+      [pageSize]="pageSize"
+      [totalCount]="totalCount()"
+      [totalPages]="totalPages()"
+      (pageChange)="load($event)"
+    />
+  }
+</section>

@@ -1,0 +1,99 @@
+<app-page-header
+  eyebrow="Orders"
+  title="Sales orders"
+  subtitle="Review GT, MT, quotation, and campaign orders through approval, reservation, fulfilment, and closure."
+  primaryActionLabel="New order"
+  (primaryAction)="createOrder()"
+/>
+
+@if (error()) {
+  <div class="alert error">
+    {{ error() }}
+  </div>
+}
+
+<section class="section-card">
+  <div class="filters">
+    <input
+      [(ngModel)]="search"
+      placeholder="Search by order number or client"
+      (keyup.enter)="load(1)"
+    />
+
+    <button type="button" (click)="load(1)">Search</button>
+  </div>
+
+  @if (loading()) {
+    <app-loading-panel message="Loading sales orders..." />
+  } @else if (!rows().length) {
+    <app-empty-state title="No sales orders found" />
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Channel</th>
+            <th>Source</th>
+            <th>Credit</th>
+            <th>Net amount</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of rows(); track item.orderID) {
+            <tr>
+              <td>
+                {{ item.orderNo }}
+              </td>
+
+              <td>
+                {{ item.clientName }}
+              </td>
+
+              <td>
+                {{ item.orderDate | date: 'mediumDate' }}
+              </td>
+
+              <td>
+                {{ channelLabel(item.channel) }}
+              </td>
+
+              <td>
+                {{ sourceLabel(item.orderSource) }}
+              </td>
+
+              <td>
+                {{ creditLabel(item.creditCheckStatus) }}
+              </td>
+
+              <td>
+                {{ item.netAmount | number: '1.2-2' }}
+              </td>
+
+              <td>
+                <app-status-badge [label]="orderLabel(item.status)" [tone]="tone(item.status)" />
+              </td>
+
+              <td>
+                <a [routerLink]="['/orders', item.orderID]"> Open </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [pageNumber]="pageNumber"
+      [pageSize]="pageSize"
+      [totalCount]="totalCount()"
+      [totalPages]="totalPages()"
+      (pageChange)="load($event)"
+    />
+  }
+</section>

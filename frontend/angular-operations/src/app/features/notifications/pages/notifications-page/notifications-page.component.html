@@ -1,0 +1,152 @@
+<app-page-header
+  eyebrow="Infrastructure"
+  title="Notifications"
+  subtitle="Review workflow alerts, system-check results, approvals, expiries, and SLA warnings assigned to the signed-in user."
+/>
+
+<section class="notification-summary">
+  <article>
+    <span>Total results</span>
+    <strong>{{ page().totalCount }}</strong>
+  </article>
+  <article>
+    <span>Unread alerts</span>
+    <strong>{{ unreadCount() }}</strong>
+  </article>
+  <article>
+    <span>Current page</span>
+    <strong>{{ page().pageNumber }} / {{ page().totalPages || 1 }}</strong>
+  </article>
+</section>
+
+<section class="notification-toolbar">
+  <form class="search-form" (submit)="$event.preventDefault(); applySearch()">
+    <label>
+      Search notifications
+      <input
+        type="search"
+        name="notificationSearch"
+        [(ngModel)]="search"
+        placeholder="Search title or message"
+      />
+    </label>
+    <button type="submit">Search</button>
+    <button type="button" class="secondary" (click)="clearSearch()">Clear</button>
+  </form>
+
+  <div class="filter-buttons" aria-label="Notification read filter">
+    <button type="button" [class.active]="viewFilter() === 'all'" (click)="setFilter('all')">
+      All
+    </button>
+    <button type="button" [class.active]="viewFilter() === 'unread'" (click)="setFilter('unread')">
+      Unread
+    </button>
+    <button type="button" [class.active]="viewFilter() === 'read'" (click)="setFilter('read')">
+      Read
+    </button>
+  </div>
+
+  <button
+    type="button"
+    class="mark-all-button"
+    [disabled]="markingAll() || unreadCount() === 0"
+    (click)="markAllRead()"
+  >
+    {{ markingAll() ? 'Updating...' : 'Mark all read' }}
+  </button>
+</section>
+
+@if (errorMessage()) {
+  <p class="alert error">{{ errorMessage() }}</p>
+}
+
+@if (loading()) {
+  <app-loading-panel message="Loading notifications..." />
+} @else if (!visibleItems().length) {
+  <app-empty-state
+    title="No notifications found"
+    message="No notifications match the current search and read filter."
+  />
+} @else {
+  <section class="notification-list" aria-label="Notification list">
+    @for (item of visibleItems(); track item.notificationID) {
+      <article class="notification-card" [class.notification-card--unread]="!item.isRead">
+        <div class="notification-card__header">
+          <div>
+            <div class="notification-card__badges">
+              <app-status-badge
+                [label]="priorityLabel(item.priority)"
+                [tone]="priorityTone(item.priority)"
+              />
+              <span class="type-label">{{ typeLabel(item.notificationType) }}</span>
+              @if (!item.isRead) {
+                <span class="unread-label">Unread</span>
+              }
+            </div>
+            <h2>{{ item.title }}</h2>
+          </div>
+          <time [attr.datetime]="item.createdAt">
+            {{ item.createdAt | date: 'medium' }}
+          </time>
+        </div>
+
+        <p class="notification-card__message">{{ item.message }}</p>
+
+        <div class="notification-card__meta">
+          @if (item.referenceType) {
+            <span>
+              Reference: {{ item.referenceType }}
+              @if (item.referenceID) {
+                #{{ item.referenceID }}
+              }
+            </span>
+          }
+          @if (item.expiresAt) {
+            <span>Expires {{ item.expiresAt | date: 'medium' }}</span>
+          }
+          @if (item.readAt) {
+            <span>Read {{ item.readAt | date: 'medium' }}</span>
+          }
+        </div>
+
+        <div class="notification-card__actions">
+          @if (!item.isRead) {
+            <button
+              type="button"
+              class="secondary"
+              [disabled]="busyNotificationID() === item.notificationID"
+              (click)="markRead(item)"
+            >
+              {{ busyNotificationID() === item.notificationID ? 'Updating...' : 'Mark read' }}
+            </button>
+          }
+          @if (hasReference(item)) {
+            <button type="button" (click)="openReference(item)">Open reference</button>
+          }
+        </div>
+      </article>
+    }
+  </section>
+
+  <nav class="pagination" aria-label="Notification pages">
+    <button
+      type="button"
+      class="secondary"
+      [disabled]="page().pageNumber <= 1"
+      (click)="previousPage()"
+    >
+      Previous
+    </button>
+    <span>
+      Page {{ page().pageNumber }} of {{ page().totalPages || 1 }} ({{ page().totalCount }} records)
+    </span>
+    <button
+      type="button"
+      class="secondary"
+      [disabled]="page().pageNumber >= page().totalPages"
+      (click)="nextPage()"
+    >
+      Next
+    </button>
+  </nav>
+}

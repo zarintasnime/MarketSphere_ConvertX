@@ -1,0 +1,68 @@
+<app-page-header
+  eyebrow="Procurement"
+  [title]="id ? 'Edit goods receipt' : 'New goods receipt'"
+  subtitle="Load remaining purchase order quantities, record quality quantities, and batch data."
+  secondaryActionLabel="Back"
+  (secondaryAction)="router.navigate(['/procurement/goods-receipts'])"
+/>
+@if (loading()) {
+  <app-loading-panel message="Loading goods receipt..." />
+} @else {
+  @if (error()) {
+    <div class="alert error">{{ error() }}</div>
+  }
+  <form class="form-card" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-grid">
+      <label>Goods receipt no.<input formControlName="goodsReceiptNo" /></label
+      ><label
+        >Purchase order<select formControlName="purchaseOrderID" (change)="loadPurchaseOrder()">
+          <option [ngValue]="0">Select purchase order</option>
+          @for (item of purchaseOrders(); track item.purchaseOrderID) {
+            <option [ngValue]="item.purchaseOrderID">
+              {{ item.purchaseOrderNo }} — {{ item.supplierName }}
+            </option>
+          }
+        </select></label
+      ><label
+        >Warehouse<select formControlName="warehouseID">
+          <option [ngValue]="0">Select warehouse</option>
+          @for (item of warehouses(); track item.warehouseID) {
+            <option [ngValue]="item.warehouseID">{{ item.warehouseName }}</option>
+          }
+        </select></label
+      ><label>Received date<input type="date" formControlName="receivedDate" /></label
+      ><label
+        >Received by<select formControlName="receivedByEmployeeID">
+          <option [ngValue]="0">Select employee</option>
+          @for (item of employees(); track item.employeeID) {
+            <option [ngValue]="item.employeeID">
+              {{ item.employeeCode }} — {{ item.userFullName }}
+            </option>
+          }
+        </select></label
+      ><label>Supplier challan no.<input formControlName="supplierChallanNo" /></label>
+    </div>
+    <section class="section-card" formArrayName="items">
+      <h2>Receipt items</h2>
+      @for (group of items.controls; track $index) {
+        <div class="receipt-item" [formGroupName]="$index">
+          <div class="readonly-field">SKU ID {{ group.value.skuID }}</div>
+          <label
+            >Accepted<input type="number" step="0.01" formControlName="acceptedQuantity" /></label
+          ><label
+            >Rejected<input type="number" step="0.01" formControlName="rejectedQuantity" /></label
+          ><label>Batch no.<input formControlName="batchNo" /></label
+          ><label>Manufacturing date<input type="date" formControlName="manufacturingDate" /></label
+          ><label>Expiry date<input type="date" formControlName="expiryDate" /></label
+          ><label>Unit cost<input type="number" step="0.01" formControlName="unitCost" /></label
+          ><label>Rejection reason<input formControlName="rejectionReason" /></label>
+        </div>
+      }
+    </section>
+    <div class="form-actions">
+      <button type="submit" [disabled]="saving()">
+        {{ saving() ? 'Saving...' : 'Save goods receipt' }}
+      </button>
+    </div>
+  </form>
+}

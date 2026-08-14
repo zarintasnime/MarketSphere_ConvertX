@@ -1,0 +1,45 @@
+<section class="field-page">
+  <div class="field-page__heading">
+    <div>
+      <h1>My Visits</h1>
+      <p>Your latest client visits and completion status.</p>
+    </div>
+    <a class="field-button" routerLink="/field/visit/check-in">New visit</a>
+  </div>
+  @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+  }
+  @if (loading()) {
+    <div class="field-card">Loading visits...</div>
+  } @else {
+    <ul class="field-list">
+      @for (visit of result().items; track visit.visitID) {
+        <li>
+          <strong>{{ visit.clientName }}</strong>
+          <p>{{ visit.clientCode }} | {{ visit.routeName || 'No route' }}</p>
+          <p>{{ visit.checkInAt }} | {{ status(visit.status) }}</p>
+          @if (visit.isSuspiciousLocation) {
+            <p class="field-error">Location requires review.</p>
+          }
+        </li>
+      } @empty {
+        <li>No visits were found.</li>
+      }
+    </ul>
+    <div class="field-actions">
+      <button
+        class="field-button field-button--secondary"
+        [disabled]="result().pageNumber <= 1"
+        (click)="load(result().pageNumber - 1)"
+      >
+        Previous</button
+      ><button
+        class="field-button field-button--secondary"
+        [disabled]="result().pageNumber >= result().totalPages"
+        (click)="load(result().pageNumber + 1)"
+      >
+        Next
+      </button>
+    </div>
+  }
+</section>

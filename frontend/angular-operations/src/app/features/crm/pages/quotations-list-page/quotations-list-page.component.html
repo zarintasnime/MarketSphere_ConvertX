@@ -1,0 +1,97 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    title="Quotations"
+    subtitle="Create, version, review, and accept commercial quotations."
+    [primaryActionLabel]="canManage() ? 'Create quotation' : ''"
+    (primaryAction)="router.navigate(['/crm/quotations/new'])"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label>Search</label
+        ><input
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Quotation number"
+        />
+      </div>
+      <button class="msx-button msx-button--secondary" type="button" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading quotations..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Quotation</th>
+              <th>Client</th>
+              <th>Opportunity</th>
+              <th>Validity</th>
+              <th>Net Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.quotationID) {
+              <tr>
+                <td>
+                  <strong>{{ item.quotationNo }}</strong
+                  ><br /><span class="muted-text">Version {{ item.versionNo }}</span>
+                </td>
+                <td>#{{ item.clientID }}</td>
+                <td>{{ item.opportunityID ?? '—' }}</td>
+                <td>{{ item.validFrom }} to {{ item.validUntil }}</td>
+                <td>{{ item.netAmount | number: '1.2-2' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="statusLabel(item.status)"
+                    [tone]="statusTone(item.status)"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    <a
+                      class="msx-button msx-button--secondary"
+                      [routerLink]="['/crm/quotations', item.quotationID]"
+                      >Open</a
+                    >
+                    @if (canManage() && item.status === 1) {
+                      <a
+                        class="msx-button msx-button--secondary"
+                        [routerLink]="['/crm/quotations', item.quotationID, 'edit']"
+                        >Edit</a
+                      >
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No quotations were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

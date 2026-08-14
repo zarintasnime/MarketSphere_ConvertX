@@ -1,0 +1,109 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Product and Pricing"
+    title="Brands"
+    subtitle="Manage brand identities linked to the product catalog."
+  />
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+  @if (canManage()) {
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>{{ editingID() ? 'Edit brand' : 'Create brand' }}</h2>
+        @if (editingID()) {
+          <button type="button" class="msx-button msx-button--secondary" (click)="reset()">
+            Cancel edit
+          </button>
+        }
+      </div>
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label for="brandCode">Brand code</label
+          ><input id="brandCode" class="msx-input" formControlName="brandCode" />
+        </div>
+        <div class="form-field">
+          <label for="brandName">Brand name</label
+          ><input id="brandName" class="msx-input" formControlName="brandName" />
+        </div>
+        <div class="form-field form-field--full">
+          <label for="ownerCompanyName">Owner company</label
+          ><input id="ownerCompanyName" class="msx-input" formControlName="ownerCompanyName" />
+        </div>
+        <label class="checkbox-field"
+          ><input type="checkbox" formControlName="isCustomerFacing" /> Customer facing</label
+        ><label class="checkbox-field"
+          ><input type="checkbox" formControlName="isActive" /> Active</label
+        >
+        <div class="action-row form-field--full">
+          <button type="submit" class="msx-button msx-button--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save brand' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading brands..." />
+  } @else {
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Owner</th>
+              <th>Visibility</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of brands(); track item.brandID) {
+              <tr>
+                <td>{{ item.brandCode }}</td>
+                <td>
+                  <strong>{{ item.brandName }}</strong>
+                </td>
+                <td>{{ item.ownerCompanyName || 'Not specified' }}</td>
+                <td>{{ item.isCustomerFacing ? 'Customer facing' : 'Internal' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="item.isActive ? 'Active' : 'Inactive'"
+                    [tone]="item.isActive ? 'success' : 'neutral'"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    @if (canManage()) {
+                      <button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="edit(item)"
+                      >
+                        Edit</button
+                      ><button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="toggleStatus(item)"
+                      >
+                        {{ item.isActive ? 'Deactivate' : 'Activate' }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-row">No brands were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</section>

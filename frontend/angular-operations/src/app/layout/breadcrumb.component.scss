@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--msx-text-secondary);
+  font-size: 0.82rem;
+}
+.breadcrumb a {
+  color: var(--msx-color-brand-700);
+  text-decoration: none;
+  font-weight: 700;
+}

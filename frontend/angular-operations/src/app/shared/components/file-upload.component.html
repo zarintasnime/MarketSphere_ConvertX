@@ -1,0 +1,27 @@
+<div
+  class="file-upload"
+  [class.file-upload--disabled]="disabled"
+  [class.file-upload--dragging]="isDragging()"
+  (dragover)="handleDragOver($event)"
+  (dragleave)="handleDragLeave($event)"
+  (drop)="handleDrop($event)"
+>
+  <label class="file-upload__button">
+    <span>{{ label }}</span>
+    <input
+      type="file"
+      [accept]="accept"
+      [multiple]="multiple"
+      [disabled]="disabled"
+      (change)="handleSelection($event)"
+    />
+  </label>
+
+  <div class="file-upload__hint" aria-live="polite">
+    @if (selectedNames().length > 0) {
+      <span>{{ selectedNames().join(', ') }}</span>
+    } @else {
+      <span>Choose a file or drop it here.</span>
+    }
+  </div>
+</div>

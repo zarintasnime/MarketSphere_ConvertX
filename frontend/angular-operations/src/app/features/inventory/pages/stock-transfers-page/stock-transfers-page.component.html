@@ -1,0 +1,155 @@
+<app-page-header
+  eyebrow="Inventory"
+  title="Stock transfers"
+  subtitle="Move approved stock between warehouses with submit, approve, dispatch, and receive controls."
+  primaryActionLabel="New transfer"
+  (primaryAction)="showCreate = !showCreate"
+/>
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (showCreate) {
+  <form class="form-card" [formGroup]="form" (ngSubmit)="create()">
+    <div class="form-grid">
+      <label>Transfer no.<input formControlName="stockTransferNo" /></label
+      ><label
+        >From warehouse<select formControlName="fromWarehouseID">
+          <option [ngValue]="0">Select warehouse</option>
+          @for (item of warehouses(); track item.warehouseID) {
+            <option [ngValue]="item.warehouseID">{{ item.warehouseName }}</option>
+          }
+        </select></label
+      ><label
+        >To warehouse<select formControlName="toWarehouseID">
+          <option [ngValue]="0">Select warehouse</option>
+          @for (item of warehouses(); track item.warehouseID) {
+            <option [ngValue]="item.warehouseID">{{ item.warehouseName }}</option>
+          }
+        </select></label
+      ><label>Requested at<input type="datetime-local" formControlName="requestedAt" /></label>
+    </div>
+    <section class="section-card" formArrayName="items">
+      <div class="section-heading">
+        <h2>Transfer items</h2>
+        <button type="button" class="secondary" (click)="addItem()">Add item</button>
+      </div>
+      @for (group of items.controls; track $index) {
+        <div class="line-item" [formGroupName]="$index">
+          <label
+            >SKU<select formControlName="skuID">
+              <option [ngValue]="0">Select SKU</option>
+              @for (sku of skus(); track sku.skuID) {
+                <option [ngValue]="sku.skuID">{{ sku.skuCode }} — {{ sku.skuName }}</option>
+              }
+            </select></label
+          ><label>Batch ID<input type="number" formControlName="batchID" /></label
+          ><label
+            >Requested quantity<input
+              type="number"
+              step="0.01"
+              formControlName="requestedQuantity" /></label
+          ><button type="button" class="link danger" (click)="removeItem($index)">Remove</button>
+        </div>
+      }
+    </section>
+    <div class="form-actions"><button type="submit">Save transfer</button></div>
+  </form>
+}
+<section class="filter-bar">
+  <label>Search<input [(ngModel)]="search" (keyup.enter)="load(1)" /></label
+  ><button type="button" class="secondary" (click)="load(1)">Search</button>
+</section>
+@if (loading()) {
+  <app-loading-panel message="Loading stock transfers..." />
+} @else if (!rows().length) {
+  <app-empty-state title="No stock transfers found" />
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Requested</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of rows(); track item.stockTransferID) {
+          <tr>
+            <td>{{ item.stockTransferNo }}</td>
+            <td>{{ item.fromWarehouse }}</td>
+            <td>{{ item.toWarehouse }}</td>
+            <td>{{ item.requestedAt | date: 'medium' }}</td>
+            <td><app-status-badge [label]="label(item.status)" [tone]="tone(item.status)" /></td>
+            <td>
+              <button type="button" class="link" (click)="open(item.stockTransferID)">Open</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <app-pagination
+    [pageNumber]="pageNumber"
+    [pageSize]="pageSize"
+    [totalCount]="totalCount()"
+    [totalPages]="totalPages()"
+    (pageChange)="load($event)"
+  />
+}
+@if (selected(); as item) {
+  <section class="section-card">
+    <div class="section-heading">
+      <div>
+        <h2>{{ item.stockTransferNo }}</h2>
+        <p>
+          Source warehouse #{{ item.fromWarehouseID }} to destination warehouse #{{
+            item.toWarehouseID
+          }}
+        </p>
+      </div>
+      <app-status-badge [label]="label(item.status)" [tone]="tone(item.status)" />
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Batch</th>
+            <th>Requested</th>
+            <th>Dispatched</th>
+            <th>Received</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of item.items; track line.stockTransferItemID) {
+            <tr>
+              <td>{{ line.skuCode }}</td>
+              <td>{{ line.batchNo || line.batchID || '—' }}</td>
+              <td>{{ line.requestedQuantity }}</td>
+              <td>{{ line.dispatchedQuantity }}</td>
+              <td>{{ line.receivedQuantity }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="actions">
+      @if (item.status === 1) {
+        <button type="button" (click)="submit(item.stockTransferID)">Submit</button>
+      }
+      @if (item.status === 2) {
+        <button type="button" (click)="approve(item.stockTransferID)">Approve</button>
+      }
+      @if (item.status === 3) {
+        <button type="button" (click)="dispatch(item)">Dispatch full quantity</button>
+      }
+      @if (item.status === 4 || item.status === 5) {
+        <button type="button" (click)="receive(item)">Receive dispatched quantity</button>
+      }
+    </div>
+  </section>
+}

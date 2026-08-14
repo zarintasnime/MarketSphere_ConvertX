@@ -1,0 +1,6 @@
+@MarketSphere.Api_HostAddress = http://localhost:5269
+
+GET {{MarketSphere.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

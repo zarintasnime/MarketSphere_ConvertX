@@ -1,0 +1,255 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Organization"
+    title="Routes and assignments"
+    subtitle="Maintain field routes and assign employees to route or geography scope."
+    [primaryActionLabel]="canManageRoutes() ? 'New route' : ''"
+    (primaryAction)="resetRoute()"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading routes..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    @if (successMessage()) {
+      <div class="feature-card">
+        <p class="success-message">{{ successMessage() }}</p>
+      </div>
+    }
+    <div class="feature-grid">
+      <div class="feature-card feature-card--half">
+        <div class="feature-card__header"><h2>Route list</h2></div>
+        <div class="form-field">
+          <label for="routeTerritoryFilter">Filter by territory</label
+          ><select
+            id="routeTerritoryFilter"
+            class="msx-input"
+            (change)="filterRoutes(+$any($event.target).value || null)"
+          >
+            <option value="">All territories</option>
+            @for (territory of territories(); track territory.territoryID) {
+              <option [value]="territory.territoryID">{{ territory.territoryName }}</option>
+            }
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Route</th>
+                <th>Schedule</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (route of routes(); track route.routeID) {
+                <tr (click)="selectRoute(route)">
+                  <td>
+                    <strong>{{ route.routeName }}</strong
+                    ><br /><span class="muted-text">{{ route.routeCode }}</span>
+                  </td>
+                  <td>
+                    {{ dayName(route.dayOfWeek) }} · {{ frequencyName(route.visitFrequency) }}
+                  </td>
+                  <td>
+                    <app-status-badge
+                      [label]="route.isActive ? 'Active' : 'Inactive'"
+                      [tone]="route.isActive ? 'success' : 'neutral'"
+                    />
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="empty-row">No routes were found.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <form
+        class="feature-card feature-card--half"
+        [formGroup]="routeForm"
+        (ngSubmit)="saveRoute()"
+      >
+        <div class="feature-card__header">
+          <h2>{{ selectedRouteID() ? 'Edit route' : 'Create route' }}</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Territory</label
+            ><select class="msx-input" formControlName="territoryID">
+              @for (item of territories(); track item.territoryID) {
+                <option [ngValue]="item.territoryID">{{ item.territoryName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Route code</label><input class="msx-input" formControlName="routeCode" />
+          </div>
+          <div class="form-field">
+            <label>Route name</label><input class="msx-input" formControlName="routeName" />
+          </div>
+          <div class="form-field">
+            <label>Day of week</label
+            ><select class="msx-input" formControlName="dayOfWeek">
+              <option [ngValue]="null">Any day</option>
+              @for (day of days; track day) {
+                <option [ngValue]="day">{{ dayName(day) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Visit frequency</label
+            ><select class="msx-input" formControlName="visitFrequency">
+              @for (item of frequencies; track item) {
+                <option [ngValue]="item">{{ frequencyName(item) }}</option>
+              }
+            </select>
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isActive" /> Active</label
+          >
+        </div>
+        <div class="action-row">
+          <button
+            class="msx-button msx-button--primary"
+            type="submit"
+            [disabled]="saving() || !canManageRoutes()"
+          >
+            Save route
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="feature-grid">
+      <form
+        class="feature-card feature-card--half"
+        [formGroup]="employeeRouteForm"
+        (ngSubmit)="assignEmployeeRoute()"
+      >
+        <div class="feature-card__header"><h2>Employee route assignment</h2></div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Employee ID</label
+            ><input type="number" class="msx-input" formControlName="employeeID" />
+          </div>
+          <div class="form-field">
+            <label>Route</label
+            ><select class="msx-input" formControlName="routeID">
+              @for (route of routes(); track route.routeID) {
+                <option [ngValue]="route.routeID">{{ route.routeName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Effective from</label
+            ><input type="date" class="msx-input" formControlName="effectiveFrom" />
+          </div>
+          <div class="form-field">
+            <label>Effective to</label
+            ><input type="date" class="msx-input" formControlName="effectiveTo" />
+          </div>
+          <div class="form-field">
+            <label>Day</label
+            ><select class="msx-input" formControlName="dayOfWeek">
+              <option [ngValue]="null">Any day</option>
+              @for (day of days; track day) {
+                <option [ngValue]="day">{{ dayName(day) }}</option>
+              }
+            </select>
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isPrimary" /> Primary assignment</label
+          >
+        </div>
+        <button
+          class="msx-button msx-button--primary"
+          type="submit"
+          [disabled]="saving() || !canManageAssignments()"
+        >
+          Assign route
+        </button>
+      </form>
+
+      <form
+        class="feature-card feature-card--half"
+        [formGroup]="territoryAssignmentForm"
+        (ngSubmit)="assignEmployeeTerritory()"
+      >
+        <div class="feature-card__header"><h2>Employee geography assignment</h2></div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Employee ID</label
+            ><input type="number" class="msx-input" formControlName="employeeID" />
+          </div>
+          <div class="form-field">
+            <label>Scope type</label
+            ><select class="msx-input" formControlName="scopeType">
+              @for (item of scopeTypes; track item) {
+                <option [ngValue]="item">{{ scopeName(item) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Region</label
+            ><select
+              class="msx-input"
+              formControlName="regionID"
+              (change)="loadAreas(territoryAssignmentForm.controls.regionID.value)"
+            >
+              <option [ngValue]="null">None</option>
+              @for (item of regions(); track item.regionID) {
+                <option [ngValue]="item.regionID">{{ item.regionName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Area</label
+            ><select
+              class="msx-input"
+              formControlName="areaID"
+              (change)="loadTerritories(territoryAssignmentForm.controls.areaID.value)"
+            >
+              <option [ngValue]="null">None</option>
+              @for (item of areas(); track item.areaID) {
+                <option [ngValue]="item.areaID">{{ item.areaName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Territory</label
+            ><select class="msx-input" formControlName="territoryID">
+              <option [ngValue]="null">None</option>
+              @for (item of territories(); track item.territoryID) {
+                <option [ngValue]="item.territoryID">{{ item.territoryName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Effective from</label
+            ><input type="date" class="msx-input" formControlName="effectiveFrom" />
+          </div>
+          <div class="form-field">
+            <label>Effective to</label
+            ><input type="date" class="msx-input" formControlName="effectiveTo" />
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isPrimary" /> Primary assignment</label
+          >
+        </div>
+        <button
+          class="msx-button msx-button--primary"
+          type="submit"
+          [disabled]="saving() || !canManageAssignments()"
+        >
+          Assign geography
+        </button>
+      </form>
+    </div>
+  }
+</section>

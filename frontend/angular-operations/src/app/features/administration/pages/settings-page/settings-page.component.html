@@ -1,0 +1,117 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Administration"
+    title="System settings"
+    subtitle="Maintain local application configuration stored by the backend."
+    [primaryActionLabel]="canManage() ? 'New setting' : ''"
+    (primaryAction)="resetForm()"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading settings..." />
+  } @else {
+    <div class="feature-grid">
+      <div class="feature-card feature-card--half">
+        <div class="feature-card__header"><h2>Existing settings</h2></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Value</th>
+                <th>Scope</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (setting of settings(); track setting.systemSettingID) {
+                <tr (click)="select(setting)">
+                  <td>
+                    <strong>{{ setting.settingKey }}</strong
+                    ><br /><span class="muted-text">{{ dataTypeName(setting.dataType) }}</span>
+                  </td>
+                  <td>{{ setting.isEncrypted ? 'Encrypted' : setting.settingValue }}</td>
+                  <td>
+                    {{ scopeTypeName(setting.scopeType)
+                    }}{{ setting.scopeID ? ' #' + setting.scopeID : '' }}
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="empty-row">No settings were found.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <form class="feature-card feature-card--half" [formGroup]="form" (ngSubmit)="save()">
+        <div class="feature-card__header">
+          <h2>{{ selectedID() ? 'Edit setting' : 'Create setting' }}</h2>
+        </div>
+        @if (errorMessage()) {
+          <p class="error-message">{{ errorMessage() }}</p>
+        }
+        @if (successMessage()) {
+          <p class="success-message">{{ successMessage() }}</p>
+        }
+        <div class="form-grid">
+          <div class="form-field form-field--full">
+            <label for="settingKey">Setting key</label
+            ><input id="settingKey" class="msx-input" formControlName="settingKey" />
+          </div>
+          <div class="form-field form-field--full">
+            <label for="settingValue">Setting value</label
+            ><textarea
+              id="settingValue"
+              class="msx-input"
+              rows="4"
+              formControlName="settingValue"
+            ></textarea>
+          </div>
+          <div class="form-field">
+            <label for="dataType">Data type</label
+            ><select id="dataType" class="msx-input" formControlName="dataType">
+              @for (item of dataTypes; track item) {
+                <option [ngValue]="item">{{ dataTypeName(item) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="scopeType">Scope type</label
+            ><select id="scopeType" class="msx-input" formControlName="scopeType">
+              @for (item of scopeTypes; track item) {
+                <option [ngValue]="item">{{ scopeTypeName(item) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="scopeID">Scope ID</label
+            ><input id="scopeID" type="number" class="msx-input" formControlName="scopeID" />
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isEncrypted" /> Encrypted value</label
+          >
+          <div class="form-field form-field--full">
+            <label for="description">Description</label
+            ><textarea
+              id="description"
+              class="msx-input"
+              rows="3"
+              formControlName="description"
+            ></textarea>
+          </div>
+        </div>
+        <div class="action-row">
+          <button
+            class="msx-button msx-button--primary"
+            type="submit"
+            [disabled]="saving() || !canManage()"
+          >
+            {{ saving() ? 'Saving...' : 'Save setting' }}</button
+          ><button class="msx-button msx-button--secondary" type="button" (click)="resetForm()">
+            Clear
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>

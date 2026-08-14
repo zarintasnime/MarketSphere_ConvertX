@@ -1,0 +1,87 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Administration"
+    title="Audit log"
+    subtitle="Review recorded actions and entity changes."
+    primaryActionLabel="Refresh"
+    (primaryAction)="load()"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="auditSearch">Search</label
+        ><input
+          id="auditSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Action or entity"
+        />
+      </div>
+      <button class="msx-button msx-button--secondary" type="button" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading audit logs..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Entity</th>
+              <th>User</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of result().items; track log.auditLogID) {
+              <tr (click)="toggle(log)">
+                <td>{{ log.createdAt | date: 'medium' }}</td>
+                <td>{{ log.actionName }}</td>
+                <td>{{ log.entityType }}{{ log.entityID ? ' #' + log.entityID : '' }}</td>
+                <td>{{ log.userID || 'System' }}</td>
+                <td>{{ log.ipAddress || 'Unknown' }}</td>
+              </tr>
+              @if (expandedID() === log.auditLogID) {
+                <tr>
+                  <td colspan="5">
+                    <div class="audit-details">
+                      <section>
+                        <h3>Old values</h3>
+                        <pre>{{ prettyJson(log.oldValuesJson) }}</pre>
+                      </section>
+                      <section>
+                        <h3>New values</h3>
+                        <pre>{{ prettyJson(log.newValuesJson) }}</pre>
+                      </section>
+                    </div>
+                  </td>
+                </tr>
+              }
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-row">No audit records were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>

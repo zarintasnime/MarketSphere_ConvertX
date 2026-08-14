@@ -1,0 +1,138 @@
+<app-page-header
+  eyebrow="Orders"
+  title="Create sales order"
+  subtitle="Create a regular order or convert an accepted quotation or verified MT purchase order."
+/>
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+<section class="section-card">
+  <div class="mode-switch">
+    <button type="button" [class.active]="mode === 'regular'" (click)="setMode('regular')">
+      Regular order</button
+    ><button type="button" [class.active]="mode === 'quotation'" (click)="setMode('quotation')">
+      From quotation</button
+    ><button type="button" [class.active]="mode === 'mt'" (click)="setMode('mt')">
+      From MT purchase order
+    </button>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-grid">
+      <div class="form-field"><label>Order number</label><input formControlName="orderNo" /></div>
+      <div class="form-field">
+        <label>Order date</label><input type="date" formControlName="orderDate" />
+      </div>
+      <div class="form-field">
+        <label>Employee</label
+        ><select formControlName="employeeID">
+          <option [ngValue]="null">Not assigned</option>
+          @for (employee of employees(); track employee.employeeID) {
+            <option [ngValue]="employee.employeeID">
+              {{ employee.userFullName || employee.employeeCode }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Requested delivery date</label
+        ><input type="date" formControlName="requestedDeliveryDate" />
+      </div>
+      @if (mode === 'regular') {
+        <div class="form-field">
+          <label>Client</label
+          ><select formControlName="clientID">
+            <option [ngValue]="0">Select client</option>
+            @for (client of clients(); track client.clientID) {
+              <option [ngValue]="client.clientID">{{ client.clientName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Channel</label
+          ><select formControlName="channel">
+            @for (item of channelOptions; track item[0]) {
+              <option [ngValue]="item[1]">{{ item[0] }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Campaign ID</label><input type="number" formControlName="campaignID" />
+        </div>
+      }
+      @if (mode === 'quotation') {
+        <div class="form-field form-field--full">
+          <label>Accepted quotation</label
+          ><select formControlName="quotationID">
+            <option [ngValue]="0">Select quotation</option>
+            @for (quotation of quotations(); track quotation.quotationID) {
+              <option [ngValue]="quotation.quotationID">
+                {{ quotation.quotationNo }} · Client #{{ quotation.clientID }}
+              </option>
+            }
+          </select>
+        </div>
+      }
+      @if (mode === 'mt') {
+        <div class="form-field form-field--full">
+          <label>Verified MT purchase order</label
+          ><select formControlName="modernTradePurchaseOrderID">
+            <option [ngValue]="0">Select MT purchase order</option>
+            @for (po of mtOrders(); track po.modernTradePurchaseOrderID) {
+              <option [ngValue]="po.modernTradePurchaseOrderID">
+                {{ po.poNumber }} · {{ po.clientName }}
+              </option>
+            }
+          </select>
+        </div>
+      }
+      <div class="form-field">
+        <label>Price list ID</label><input type="number" formControlName="priceListID" />
+      </div>
+      <div class="form-field form-field--full">
+        <label>Delivery address</label
+        ><textarea rows="3" formControlName="deliveryAddressSnapshot"></textarea>
+      </div>
+    </div>
+    @if (mode === 'regular') {
+      <div class="section-heading">
+        <h3>Order items</h3>
+        <button type="button" class="secondary" (click)="addItem()">Add item</button>
+      </div>
+      <div formArrayName="items" class="line-grid">
+        @for (group of items.controls; track $index) {
+          <div [formGroupName]="$index" class="line-card line-form">
+            <div class="wide">
+              <label>SKU</label
+              ><select formControlName="skuID">
+                <option [ngValue]="0">Select SKU</option>
+                @for (sku of skus(); track sku.skuID) {
+                  <option [ngValue]="sku.skuID">{{ sku.skuCode }} - {{ sku.skuName }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label>Ordered</label
+              ><input type="number" step="0.01" formControlName="orderedQuantity" />
+            </div>
+            <div>
+              <label>Free</label><input type="number" step="0.01" formControlName="freeQuantity" />
+            </div>
+            <div>
+              <label>Unit price</label
+              ><input type="number" step="0.01" formControlName="unitPrice" />
+            </div>
+            <div>
+              <label>Discount %</label
+              ><input type="number" step="0.01" formControlName="discountPercent" />
+            </div>
+            <div>
+              <label>Tax</label><input type="number" step="0.01" formControlName="taxAmount" />
+            </div>
+            <button type="button" class="danger" (click)="removeItem($index)">Remove</button>
+          </div>
+        }
+      </div>
+    }
+    <div class="actions"><button type="submit">Create order</button></div>
+  </form>
+</section>

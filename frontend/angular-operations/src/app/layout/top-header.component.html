@@ -1,0 +1,39 @@
+<header class="top-header">
+  <div>
+    <p class="top-header__eyebrow">Localhost Operations</p>
+    <strong>MarketSphere ConvertX</strong>
+  </div>
+
+  <div class="top-header__actions">
+    <button
+      type="button"
+      class="top-header__refresh"
+      [disabled]="badgeLoading()"
+      (click)="refreshNotifications()"
+      aria-label="Refresh notification count"
+    >
+      {{ badgeLoading() ? 'Refreshing...' : 'Refresh alerts' }}
+    </button>
+
+    <a
+      routerLink="/notifications"
+      class="top-header__notification-link"
+      aria-label="Open notifications"
+    >
+      <span>Notifications</span>
+      @if (unreadCount() > 0) {
+        <strong class="top-header__badge">{{ unreadCount() }}</strong>
+      }
+    </a>
+
+    <div class="top-header__profile">
+      <span>
+        <strong>{{ user()?.fullName }}</strong>
+        <small>{{ user()?.email }}</small>
+      </span>
+      <button type="button" class="msx-button msx-button--secondary" (click)="signOut()">
+        Sign out
+      </button>
+    </div>
+  </div>
+</header>

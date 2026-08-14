@@ -1,0 +1,140 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    [title]="isNew() ? 'Create Complaint' : 'Complaint Details'"
+    subtitle="Capture the issue, ownership, related transaction references, SLA target, and resolution."
+    secondaryActionLabel="Back to complaints"
+    (secondaryAction)="router.navigate(['/crm/complaints'])"
+  />
+
+  @if (loading()) {
+    <app-loading-panel message="Loading complaint workspace..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    @if (details(); as item) {
+      <div class="metric-grid">
+        <div class="feature-card metric-tile">
+          <span>Status</span><app-status-badge [label]="statusLabel(item.status)" tone="info" />
+        </div>
+        <div class="feature-card metric-tile">
+          <span>Opened</span><strong>{{ item.openedAt | date: 'medium' }}</strong>
+        </div>
+        <div class="feature-card metric-tile">
+          <span>Resolved</span
+          ><strong>{{ item.resolvedAt ? (item.resolvedAt | date: 'medium') : 'Pending' }}</strong>
+        </div>
+        <div class="feature-card metric-tile">
+          <span>Satisfaction</span><strong>{{ item.satisfactionScore ?? 'Not rated' }}</strong>
+        </div>
+      </div>
+    }
+
+    <div class="feature-card">
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label>Complaint number</label><input class="msx-input" formControlName="complaintNo" />
+        </div>
+        <div class="form-field">
+          <label>Client</label
+          ><select class="msx-input" formControlName="clientID">
+            <option [ngValue]="0">Select client</option>
+            @for (item of clients(); track item.clientID) {
+              <option [ngValue]="item.clientID">
+                {{ item.clientCode }} - {{ item.clientName }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Category</label
+          ><select class="msx-input" formControlName="complaintCategory">
+            @for (option of categoryOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Priority</label
+          ><select class="msx-input" formControlName="priority">
+            @for (option of priorityOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field form-field--full">
+          <label>Subject</label><input class="msx-input" formControlName="subject" />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Details</label
+          ><textarea rows="5" class="msx-input" formControlName="details"></textarea>
+        </div>
+        <div class="form-field">
+          <label>Order ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="orderID" />
+        </div>
+        <div class="form-field">
+          <label>Invoice ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="invoiceID" />
+        </div>
+        <div class="form-field">
+          <label>Delivery ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="deliveryID" />
+        </div>
+        <div class="form-field">
+          <label>Assigned employee ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="assignedEmployeeID" />
+        </div>
+        <div class="form-field">
+          <label>SLA due at</label
+          ><input type="datetime-local" class="msx-input" formControlName="slaDueAt" />
+        </div>
+        @if (canManage()) {
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+              {{ saving() ? 'Saving...' : 'Save complaint' }}
+            </button>
+          </div>
+        }
+      </form>
+    </div>
+
+    @if (!isNew() && canManage()) {
+      <div class="feature-card">
+        <h2>Resolution and Status</h2>
+        <form class="form-grid" [formGroup]="statusForm" (ngSubmit)="changeStatus()">
+          <div class="form-field">
+            <label>Status</label
+            ><select class="msx-input" formControlName="status">
+              @for (option of statusOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Satisfaction score</label
+            ><input
+              type="number"
+              min="1"
+              max="5"
+              class="msx-input"
+              formControlName="satisfactionScore"
+            />
+          </div>
+          <div class="form-field form-field--full">
+            <label>Resolution note</label
+            ><textarea rows="3" class="msx-input" formControlName="resolutionNote"></textarea>
+          </div>
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+              Apply status
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  }
+</section>

@@ -1,0 +1,134 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Marketing"
+    title="Market Observations"
+    subtitle="Record product availability, displays, competitor prices, offers, and merchandising conditions."
+  />
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+  @if (canManage()) {
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>{{ editingID() ? 'Edit record' : 'Create record' }}</h2>
+        @if (editingID()) {
+          <button class="msx-button msx-button--secondary" type="button" (click)="reset()">
+            Cancel edit
+          </button>
+        }
+      </div>
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field">
+          <label>Visit ID</label><input class="msx-input" type="number" formControlName="visitID" />
+        </div>
+        <div class="form-field">
+          <label>Client ID</label
+          ><input class="msx-input" type="number" formControlName="clientID" />
+        </div>
+        <div class="form-field">
+          <label>Employee ID</label
+          ><input class="msx-input" type="number" formControlName="employeeID" />
+        </div>
+        <div class="form-field">
+          <label>Observation type</label
+          ><input class="msx-input" type="number" formControlName="observationType" />
+        </div>
+        <div class="form-field">
+          <label>SKU ID</label><input class="msx-input" type="number" formControlName="skuID" />
+        </div>
+        <div class="form-field">
+          <label>Availability status</label
+          ><input class="msx-input" type="number" formControlName="availabilityStatus" />
+        </div>
+        <div class="form-field">
+          <label>Facing count</label
+          ><input class="msx-input" type="number" formControlName="facingCount" />
+        </div>
+        <div class="form-field">
+          <label>Display score</label
+          ><input class="msx-input" type="number" formControlName="displayScore" />
+        </div>
+        <div class="form-field">
+          <label>Competitor brand</label
+          ><input class="msx-input" formControlName="competitorBrand" />
+        </div>
+        <div class="form-field">
+          <label>Competitor product</label
+          ><input class="msx-input" formControlName="competitorProduct" />
+        </div>
+        <div class="form-field">
+          <label>Competitor price</label
+          ><input class="msx-input" type="number" formControlName="competitorPrice" />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Note</label><textarea class="msx-input" formControlName="note"></textarea>
+        </div>
+        <div class="action-row form-field--full">
+          <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save record' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading records..." />
+  } @else {
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Visit</th>
+              <th>Client</th>
+              <th>Employee</th>
+              <th>Type</th>
+              <th>SKU</th>
+              <th>Competitor</th>
+              <th>Price</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.marketObservationID) {
+              <tr>
+                <td>{{ item.visitID }}</td>
+                <td>{{ item.clientID }}</td>
+                <td>{{ item.employeeID }}</td>
+                <td>{{ item.observationType }}</td>
+                <td>{{ item.skuID ?? 'N/A' }}</td>
+                <td>{{ item.competitorBrand || 'N/A' }}</td>
+                <td>{{ item.competitorPrice ?? 'N/A' }}</td>
+                <td>
+                  <div class="action-row">
+                    @if (canManage()) {
+                      <button
+                        class="msx-button msx-button--secondary"
+                        type="button"
+                        (click)="edit(item)"
+                      >
+                        Edit</button
+                      ><button
+                        class="msx-button msx-button--danger"
+                        type="button"
+                        (click)="remove(item)"
+                      >
+                        Delete
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">No records were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</section>

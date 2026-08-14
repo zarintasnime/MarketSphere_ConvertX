@@ -1,0 +1,85 @@
+<app-page-header
+  eyebrow="Fulfilment"
+  title="Invoice details"
+  subtitle="Review invoice lines, payment exposure, and controlled invoice status transitions."
+/>
+@if (loading()) {
+  <app-loading-panel message="Loading invoice details..." />
+}
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (success()) {
+  <div class="alert success">{{ success() }}</div>
+}
+@if (item(); as invoice) {
+  <section class="section-card">
+    <div class="section-heading">
+      <div>
+        <h2>{{ invoice.invoiceNo }}</h2>
+        <p>Order #{{ invoice.orderID }} · Client #{{ invoice.clientID }}</p>
+      </div>
+      <app-status-badge [label]="label(invoice.status)" [tone]="tone(invoice.status)" />
+    </div>
+    <div class="metrics">
+      <div class="metric">
+        <span>Invoice date</span><strong>{{ invoice.invoiceDate | date: 'mediumDate' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Total</span><strong>{{ invoice.totalAmount | number: '1.2-2' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Paid</span><strong>{{ invoice.paidAmount | number: '1.2-2' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Due</span><strong>{{ invoice.dueAmount | number: '1.2-2' }}</strong>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Order item</th>
+            <th>Quantity</th>
+            <th>Unit price</th>
+            <th>Discount</th>
+            <th>Tax</th>
+            <th>Line total</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of invoice.items; track line.invoiceItemID) {
+            <tr>
+              <td>{{ line.skuCode }}</td>
+              <td>#{{ line.orderItemID }}</td>
+              <td>{{ line.quantity }}</td>
+              <td>{{ line.unitPrice | number: '1.2-2' }}</td>
+              <td>{{ line.discountAmount | number: '1.2-2' }}</td>
+              <td>{{ line.taxAmount | number: '1.2-2' }}</td>
+              <td>{{ line.lineTotal | number: '1.2-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="form-grid">
+      <div class="form-field">
+        <label>New status</label
+        ><select [(ngModel)]="nextStatus">
+          @for (entry of options; track entry[0]) {
+            <option [ngValue]="entry[1]">{{ entry[0] }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" (click)="changeStatus()">Change status</button
+      ><a
+        [routerLink]="['/returns-payments/payments']"
+        [queryParams]="{ clientID: invoice.clientID }"
+        >Receive payment</a
+      >
+    </div>
+  </section>
+}

@@ -1,0 +1,125 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Administration"
+    [title]="isEdit() ? 'Edit employee' : 'Create employee'"
+    subtitle="Link the employee to organization and geography scope."
+    secondaryActionLabel="Back"
+    (secondaryAction)="router.navigate(['/administration/employees'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading employee form..." />
+  } @else {
+    <form class="feature-card" [formGroup]="form" (ngSubmit)="save()">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <p class="muted-text">
+        DesignationID is entered directly because the current backend has no designation lookup
+        endpoint.
+      </p>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="employeeCode">Employee code</label
+          ><input id="employeeCode" class="msx-input" formControlName="employeeCode" />
+        </div>
+        <div class="form-field">
+          <label for="userID">User ID</label
+          ><input id="userID" type="number" class="msx-input" formControlName="userID" />
+        </div>
+        <div class="form-field">
+          <label for="designationID">Designation ID</label
+          ><input
+            id="designationID"
+            type="number"
+            class="msx-input"
+            formControlName="designationID"
+          />
+        </div>
+        <div class="form-field">
+          <label for="managerEmployeeID">Manager employee ID</label
+          ><input
+            id="managerEmployeeID"
+            type="number"
+            class="msx-input"
+            formControlName="managerEmployeeID"
+          />
+        </div>
+        <div class="form-field">
+          <label for="branchID">Branch</label
+          ><select id="branchID" class="msx-input" formControlName="branchID">
+            <option [ngValue]="0">Select branch</option>
+            @for (item of branches(); track item.branchID) {
+              <option [ngValue]="item.branchID">{{ item.branchName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="regionID">Region</label
+          ><select
+            id="regionID"
+            class="msx-input"
+            formControlName="regionID"
+            (change)="loadAreas(form.controls.regionID.value)"
+          >
+            <option [ngValue]="null">No region</option>
+            @for (item of regions(); track item.regionID) {
+              <option [ngValue]="item.regionID">{{ item.regionName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="areaID">Area</label
+          ><select
+            id="areaID"
+            class="msx-input"
+            formControlName="areaID"
+            (change)="loadTerritories(form.controls.areaID.value)"
+          >
+            <option [ngValue]="null">No area</option>
+            @for (item of areas(); track item.areaID) {
+              <option [ngValue]="item.areaID">{{ item.areaName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="territoryID">Territory</label
+          ><select id="territoryID" class="msx-input" formControlName="territoryID">
+            <option [ngValue]="null">No territory</option>
+            @for (item of territories(); track item.territoryID) {
+              <option [ngValue]="item.territoryID">{{ item.territoryName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="joiningDate">Joining date</label
+          ><input id="joiningDate" type="date" class="msx-input" formControlName="joiningDate" />
+        </div>
+        <div class="form-field">
+          <label for="endDate">End date</label
+          ><input id="endDate" type="date" class="msx-input" formControlName="endDate" />
+        </div>
+        <div class="form-field">
+          <label for="status">Status</label
+          ><select id="status" class="msx-input" formControlName="status">
+            @for (item of statuses; track item) {
+              <option [ngValue]="item">{{ statusName(item) }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="phone">Phone</label
+          ><input id="phone" class="msx-input" formControlName="phone" />
+        </div>
+        <div class="form-field form-field--full">
+          <label for="email">Email</label
+          ><input id="email" type="email" class="msx-input" formControlName="email" />
+        </div>
+      </div>
+      <div class="action-row">
+        <button type="submit" class="msx-button msx-button--primary" [disabled]="saving()">
+          {{ saving() ? 'Saving...' : 'Save employee' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

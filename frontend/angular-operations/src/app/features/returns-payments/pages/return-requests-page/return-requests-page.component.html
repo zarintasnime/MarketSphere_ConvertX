@@ -1,0 +1,134 @@
+<app-page-header
+  eyebrow="Returns and Payments"
+  title="Customer returns"
+  subtitle="Create complaint-linked delivery returns and control approval, inspection, stock disposition, credit, and replacement."
+  primaryActionLabel="New return request"
+  (primaryAction)="showCreate = !showCreate"
+/>
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (showCreate) {
+  <section class="section-card">
+    <form [formGroup]="form" (ngSubmit)="create()">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Return number</label><input formControlName="returnNo" />
+        </div>
+        <div class="form-field">
+          <label>Client</label
+          ><select formControlName="clientID">
+            <option [ngValue]="0">Select client</option>
+            @for (client of clients(); track client.clientID) {
+              <option [ngValue]="client.clientID">{{ client.clientName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Order ID</label><input type="number" formControlName="orderID" />
+        </div>
+        <div class="form-field">
+          <label>Invoice ID</label><input type="number" formControlName="invoiceID" />
+        </div>
+        <div class="form-field">
+          <label>Delivery ID</label><input type="number" formControlName="deliveryID" />
+        </div>
+        <div class="form-field">
+          <label>Complaint ID</label><input type="number" formControlName="complaintID" />
+        </div>
+        <div class="form-field">
+          <label>Request date</label><input type="date" formControlName="requestDate" />
+        </div>
+        <div class="form-field">
+          <label>Return reason</label><input formControlName="returnReason" />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Description</label><textarea rows="3" formControlName="description"></textarea>
+        </div>
+      </div>
+      <div class="section-heading">
+        <h3>Requested items</h3>
+        <button type="button" class="secondary" (click)="addItem()">Add item</button>
+      </div>
+      <div formArrayName="items" class="line-grid">
+        @for (group of items.controls; track $index) {
+          <div class="line-card line-form" [formGroupName]="$index">
+            <div class="wide">
+              <label>Delivery item ID</label
+              ><input type="number" formControlName="deliveryItemID" />
+            </div>
+            <div>
+              <label>Requested quantity</label
+              ><input type="number" step="0.01" formControlName="requestedQuantity" />
+            </div>
+            <button type="button" class="danger" (click)="removeItem($index)">Remove</button>
+          </div>
+        }
+      </div>
+      <div class="actions">
+        <button type="submit">Create return request</button
+        ><button type="button" class="secondary" (click)="showCreate = false">Cancel</button>
+      </div>
+    </form>
+  </section>
+}
+<section class="section-card">
+  <div class="filters">
+    <input
+      [(ngModel)]="search"
+      placeholder="Search return number or reason"
+      (keyup.enter)="load(1)"
+    /><button type="button" (click)="load(1)">Search</button>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading customer returns..." />
+  } @else if (!rows().length) {
+    <app-empty-state title="No customer returns found" />
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Return</th>
+            <th>Client</th>
+            <th>Order</th>
+            <th>Invoice</th>
+            <th>Delivery</th>
+            <th>Date</th>
+            <th>Reason</th>
+            <th>Resolution</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of rows(); track item.returnRequestID) {
+            <tr>
+              <td>{{ item.returnNo }}</td>
+              <td>#{{ item.clientID }}</td>
+              <td>#{{ item.orderID }}</td>
+              <td>{{ item.invoiceID || '—' }}</td>
+              <td>{{ item.deliveryID || '—' }}</td>
+              <td>{{ item.requestDate | date: 'mediumDate' }}</td>
+              <td>{{ item.returnReason }}</td>
+              <td>{{ resolutionLabel(item.resolutionType) }}</td>
+              <td>
+                <app-status-badge [label]="statusLabel(item.status)" [tone]="tone(item.status)" />
+              </td>
+              <td>
+                <a [routerLink]="['/returns-payments/returns', item.returnRequestID]">Open</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination
+      [pageNumber]="pageNumber"
+      [pageSize]="pageSize"
+      [totalCount]="totalCount()"
+      [totalPages]="totalPages()"
+      (pageChange)="load($event)"
+    />
+  }
+</section>

@@ -1,0 +1,185 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    [title]="isEdit() ? 'Edit Quotation Draft' : 'Create Quotation Draft'"
+    subtitle="Build a versioned quotation with validated client and SKU lines."
+    secondaryActionLabel="Back to quotations"
+    (secondaryAction)="router.navigate(['/crm/quotations'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading quotation form..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    <div class="feature-card">
+      <form class="form-grid" [formGroup]="form">
+        <div class="form-field">
+          <label>Quotation number</label><input class="msx-input" formControlName="quotationNo" />
+        </div>
+        <div class="form-field">
+          <label>Client</label
+          ><select class="msx-input" formControlName="clientID">
+            <option [ngValue]="0">Select client</option>
+            @for (item of clients(); track item.clientID) {
+              <option [ngValue]="item.clientID">
+                {{ item.clientCode }} - {{ item.clientName }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Opportunity</label
+          ><select class="msx-input" formControlName="opportunityID">
+            <option [ngValue]="null">No opportunity</option>
+            @for (item of opportunities(); track item.opportunityID) {
+              <option [ngValue]="item.opportunityID">
+                {{ item.opportunityCode }} - {{ item.opportunityName }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Campaign ID</label
+          ><input type="number" min="1" class="msx-input" formControlName="campaignID" />
+        </div>
+        <div class="form-field">
+          <label>Price list</label
+          ><select class="msx-input" formControlName="priceListID">
+            <option [ngValue]="null">No price list</option>
+            @for (item of priceLists(); track item.priceListID) {
+              <option [ngValue]="item.priceListID">
+                {{ item.priceListCode }} - {{ item.priceListName }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Valid from</label
+          ><input type="date" class="msx-input" formControlName="validFrom" />
+        </div>
+        <div class="form-field">
+          <label>Valid until</label
+          ><input type="date" class="msx-input" formControlName="validUntil" />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Terms</label
+          ><textarea rows="3" class="msx-input" formControlName="terms"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="feature-card">
+      <h2>Add Quotation Item</h2>
+      <form class="form-grid" [formGroup]="itemForm" (ngSubmit)="addItem()">
+        <div class="form-field">
+          <label>SKU</label
+          ><select class="msx-input" formControlName="skuID" (change)="useTradePrice()">
+            <option [ngValue]="0">Select SKU</option>
+            @for (item of skus(); track item.skuID) {
+              <option [ngValue]="item.skuID">{{ item.skuCode }} - {{ item.skuName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Quantity</label
+          ><input
+            type="number"
+            min="0.01"
+            step="0.01"
+            class="msx-input"
+            formControlName="quantity"
+          />
+        </div>
+        <div class="form-field">
+          <label>Unit price</label
+          ><input type="number" min="0" step="0.01" class="msx-input" formControlName="unitPrice" />
+        </div>
+        <div class="form-field">
+          <label>Discount %</label
+          ><input
+            type="number"
+            min="0"
+            max="100"
+            step="0.01"
+            class="msx-input"
+            formControlName="discountPercent"
+          />
+        </div>
+        <div class="form-field">
+          <label>Tax amount</label
+          ><input type="number" min="0" step="0.01" class="msx-input" formControlName="taxAmount" />
+        </div>
+        <div class="form-field">
+          <label>Note</label><input class="msx-input" formControlName="note" />
+        </div>
+        <div class="action-row form-field--full">
+          <button class="msx-button msx-button--secondary" type="submit">Add item</button>
+        </div>
+      </form>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>Quotation Items</h2>
+        <strong>Net {{ netTotal() | number: '1.2-2' }}</strong>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Discount</th>
+              <th>Tax</th>
+              <th>Line Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.skuID) {
+              <tr>
+                <td>{{ item.skuCode }} - {{ item.skuName }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unitPrice | number: '1.2-2' }}</td>
+                <td>{{ item.discountPercent }}%</td>
+                <td>{{ item.taxAmount | number: '1.2-2' }}</td>
+                <td>{{ lineTotal(item) | number: '1.2-2' }}</td>
+                <td>
+                  <button
+                    class="msx-button msx-button--secondary"
+                    type="button"
+                    (click)="removeItem(item.skuID)"
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">Add at least one quotation item.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="action-row">
+      <button
+        type="button"
+        class="msx-button msx-button--primary"
+        [disabled]="saving()"
+        (click)="save()"
+      >
+        {{ saving() ? 'Saving...' : 'Save quotation' }}</button
+      ><button
+        type="button"
+        class="msx-button msx-button--secondary"
+        (click)="router.navigate(['/crm/quotations'])"
+      >
+        Cancel
+      </button>
+    </div>
+  }
+</section>

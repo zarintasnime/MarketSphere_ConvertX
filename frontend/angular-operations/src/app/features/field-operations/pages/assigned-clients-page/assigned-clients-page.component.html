@@ -1,0 +1,64 @@
+<section class="field-page">
+  <div class="field-page__heading">
+    <div>
+      <h1>Assigned Clients</h1>
+      <p>Clients assigned through your route or territory scope.</p>
+    </div>
+  </div>
+  <div class="field-card">
+    <form class="field-actions" (ngSubmit)="load(1)">
+      <input
+        class="field-input"
+        style="flex: 1"
+        name="search"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        placeholder="Search clients"
+      /><button class="field-button" type="submit">Search</button>
+    </form>
+  </div>
+  @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+  }
+  @if (loading()) {
+    <div class="field-card">Loading clients...</div>
+  } @else {
+    <ul class="field-list">
+      @for (client of result().items; track client.clientID) {
+        <li>
+          <div class="field-page__heading">
+            <div>
+              <strong>{{ client.clientName }}</strong>
+              <p>{{ client.clientCode }} | {{ client.routeName || 'No route' }}</p>
+              <p>{{ client.address }}</p>
+              @if (client.phone) {
+                <p>{{ client.phone }}</p>
+              }
+            </div>
+            <button class="field-button" type="button" (click)="startVisit(client)">
+              Check in
+            </button>
+          </div>
+        </li>
+      } @empty {
+        <li>No assigned clients were found.</li>
+      }
+    </ul>
+    <div class="field-actions">
+      <button
+        class="field-button field-button--secondary"
+        [disabled]="result().pageNumber <= 1"
+        (click)="load(result().pageNumber - 1)"
+      >
+        Previous</button
+      ><span>Page {{ result().pageNumber }} of {{ result().totalPages || 1 }}</span
+      ><button
+        class="field-button field-button--secondary"
+        [disabled]="result().pageNumber >= result().totalPages"
+        (click)="load(result().pageNumber + 1)"
+      >
+        Next
+      </button>
+    </div>
+  }
+</section>

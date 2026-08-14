@@ -1,0 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MarketSphere.Domain.Entities.Infrastructure;
+namespace MarketSphere.Infrastructure.Persistence.Configurations.Infrastructure;
+public sealed class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog> { public void Configure(EntityTypeBuilder<AuditLog> builder) { builder.ToTable("AuditLogs"); builder.HasKey(x => x.AuditLogID); builder.Property(x => x.ActionName).HasMaxLength(150).IsRequired(); builder.Property(x => x.EntityType).HasMaxLength(100).IsRequired(); builder.Property(x => x.OldValuesJson).HasColumnType("nvarchar(max)"); builder.Property(x => x.NewValuesJson).HasColumnType("nvarchar(max)"); builder.Property(x => x.IPAddress).HasMaxLength(100); builder.Property(x => x.DeviceIdentifier).HasMaxLength(300); builder.HasIndex(x => new { x.EntityType, x.EntityID, x.CreatedAt }); builder.HasIndex(x => new { x.UserID, x.CreatedAt }); builder.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserID).OnDelete(DeleteBehavior.Restrict); } }

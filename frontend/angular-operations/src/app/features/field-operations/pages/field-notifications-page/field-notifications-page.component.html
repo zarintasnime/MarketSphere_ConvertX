@@ -1,0 +1,63 @@
+<section class="field-page">
+  <div class="field-page__heading">
+    <div>
+      <h1>Notifications</h1>
+      <p>Workflow alerts and manual system-check results assigned to you.</p>
+    </div>
+    <span class="field-unread-count">{{ unreadCount() }} unread</span>
+  </div>
+
+  <div class="field-actions">
+    <button class="field-button field-button--secondary" type="button" (click)="load()">
+      Refresh
+    </button>
+    <button class="field-button field-button--secondary" type="button" (click)="toggleUnreadOnly()">
+      {{ showUnreadOnly() ? 'Show all' : 'Unread only' }}
+    </button>
+    <button
+      class="field-button"
+      type="button"
+      [disabled]="unreadCount() === 0"
+      (click)="markAllRead()"
+    >
+      Mark all read
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <div class="field-card">Loading notifications...</div>
+  } @else {
+    <ul class="field-list">
+      @for (item of items(); track item.notificationID) {
+        <li [class.field-list__item--unread]="!item.isRead">
+          <div class="field-notification__heading">
+            <div>
+              <span class="field-priority">{{ priorityLabel(item.priority) }}</span>
+              <strong>{{ item.title }}</strong>
+            </div>
+            <time [attr.datetime]="item.createdAt">
+              {{ item.createdAt | date: 'short' }}
+            </time>
+          </div>
+          <p>{{ item.message }}</p>
+          @if (!item.isRead) {
+            <button
+              class="field-button field-button--secondary"
+              type="button"
+              [disabled]="busyID() === item.notificationID"
+              (click)="markRead(item)"
+            >
+              {{ busyID() === item.notificationID ? 'Updating...' : 'Mark read' }}
+            </button>
+          }
+        </li>
+      } @empty {
+        <li>No notifications match the current filter.</li>
+      }
+    </ul>
+  }
+</section>

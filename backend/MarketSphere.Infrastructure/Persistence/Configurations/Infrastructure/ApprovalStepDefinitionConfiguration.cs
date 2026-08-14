@@ -1,0 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MarketSphere.Domain.Entities.Infrastructure;
+namespace MarketSphere.Infrastructure.Persistence.Configurations.Infrastructure;
+public sealed class ApprovalStepDefinitionConfiguration : IEntityTypeConfiguration<ApprovalStepDefinition> { public void Configure(EntityTypeBuilder<ApprovalStepDefinition> builder) { builder.ToTable("ApprovalStepDefinitions", t => t.HasCheckConstraint("CK_ApprovalStepDefinitions_Values", "[StepNo] > 0 AND [MinimumApprovals] > 0 AND ([EscalationHours] IS NULL OR [EscalationHours] > 0)")); builder.HasKey(x => x.ApprovalStepDefinitionID); builder.Property(x => x.StepName).HasMaxLength(150).IsRequired(); builder.Property(x => x.ApprovalMode).HasConversion<int>(); builder.HasIndex(x => new { x.ApprovalPolicyID, x.StepNo }).IsUnique(); builder.HasOne(x => x.ApprovalPolicy).WithMany(x => x.Steps).HasForeignKey(x => x.ApprovalPolicyID).OnDelete(DeleteBehavior.Restrict); } }

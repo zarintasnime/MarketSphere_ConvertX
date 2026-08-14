@@ -1,0 +1,75 @@
+<section class="field-page">
+  <div class="field-page__heading">
+    <div>
+      <h1>Active Visit</h1>
+      <p>Complete field capture, then check out from the client location.</p>
+    </div>
+  </div>
+  @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+  }
+  @if (loading()) {
+    <div class="field-card">Loading active visit...</div>
+  } @else if (item(); as visit) {
+    <div class="field-card">
+      <h2>{{ visit.clientName }}</h2>
+      <p>{{ visit.clientCode }} | {{ visit.routeName || 'No route' }}</p>
+      <p>Checked in at {{ visit.checkInAt }}</p>
+      <div class="field-actions">
+        <a class="field-button field-button--secondary" routerLink="/field/feedback">Feedback</a
+        ><a class="field-button field-button--secondary" routerLink="/field/observation"
+          >Observation</a
+        ><a class="field-button field-button--secondary" routerLink="/field/bp-sell-out"
+          >BP sell-out</a
+        ><a class="field-button field-button--secondary" routerLink="/field/mt-po">MT PO</a>
+      </div>
+    </div>
+    <div class="field-card">
+      <h2>Check out</h2>
+      @if (locationData(); as gps) {
+        <p class="field-success">
+          Location captured: {{ gps.latitude.toFixed(6) }}, {{ gps.longitude.toFixed(6) }}
+        </p>
+      }
+      <button
+        class="field-button field-button--secondary"
+        type="button"
+        (click)="captureLocation()"
+      >
+        Capture checkout location
+      </button>
+      <form class="field-grid" [formGroup]="checkoutForm" (ngSubmit)="checkOut()">
+        <div class="field-control" style="grid-column: 1/-1">
+          <label>Completion note</label
+          ><textarea class="field-input" rows="3" formControlName="note"></textarea>
+        </div>
+        <button class="field-button" style="grid-column: 1/-1" type="submit" [disabled]="saving()">
+          Complete visit
+        </button>
+      </form>
+    </div>
+    <div class="field-card">
+      <h2>Cancel visit</h2>
+      <form class="field-grid" [formGroup]="cancelForm" (ngSubmit)="cancelVisit()">
+        <div class="field-control" style="grid-column: 1/-1">
+          <label>Reason</label
+          ><textarea class="field-input" rows="3" formControlName="reason"></textarea>
+        </div>
+        <button
+          class="field-button field-button--danger"
+          style="grid-column: 1/-1"
+          type="submit"
+          [disabled]="saving()"
+        >
+          Cancel visit
+        </button>
+      </form>
+    </div>
+  } @else {
+    <div class="field-card">
+      <h2>No active visit</h2>
+      <p>Start a visit from an assigned client.</p>
+      <a class="field-button" routerLink="/field/clients">Open clients</a>
+    </div>
+  }
+</section>

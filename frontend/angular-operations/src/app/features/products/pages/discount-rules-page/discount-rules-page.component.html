@@ -1,0 +1,270 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Product and Pricing"
+    title="Discount Rules"
+    subtitle="Control standard discounts and approval thresholds."
+    [primaryActionLabel]="canManage() ? 'Create discount rule' : ''"
+    (primaryAction)="openCreate()"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label for="discountSearch">Search</label
+        ><input
+          id="discountSearch"
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Rule name"
+        />
+      </div>
+      <button type="button" class="msx-button msx-button--secondary" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (editorOpen()) {
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>{{ editingID() ? 'Edit discount rule' : 'Create discount rule' }}</h2>
+        <button type="button" class="msx-button msx-button--secondary" (click)="closeEditor()">
+          Close
+        </button>
+      </div>
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-field form-field--full">
+          <label for="ruleName">Rule name</label
+          ><input id="ruleName" class="msx-input" formControlName="ruleName" />
+        </div>
+        <div class="form-field">
+          <label for="ruleChannel">Channel</label
+          ><select id="ruleChannel" class="msx-input" formControlName="channel">
+            @for (option of channelOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="ruleSegment">Client segment ID</label
+          ><input
+            id="ruleSegment"
+            type="number"
+            min="1"
+            class="msx-input"
+            formControlName="clientSegmentID"
+          />
+        </div>
+        <div class="form-field">
+          <label for="ruleSku">SKU ID</label
+          ><input id="ruleSku" type="number" min="1" class="msx-input" formControlName="skuID" />
+        </div>
+        <div class="form-field">
+          <label for="ruleCategory">Product category ID</label
+          ><input
+            id="ruleCategory"
+            type="number"
+            min="1"
+            class="msx-input"
+            formControlName="productCategoryID"
+          />
+        </div>
+        <div class="form-field">
+          <label for="ruleMinQuantity">Minimum quantity</label
+          ><input
+            id="ruleMinQuantity"
+            type="number"
+            min="0"
+            step="0.01"
+            class="msx-input"
+            formControlName="minQuantity"
+          />
+        </div>
+        <div class="form-field">
+          <label for="ruleMaxDiscount">Maximum discount %</label
+          ><input
+            id="ruleMaxDiscount"
+            type="number"
+            min="0"
+            max="100"
+            step="0.01"
+            class="msx-input"
+            formControlName="maxDiscountPercent"
+          />
+        </div>
+        <div class="form-field">
+          <label for="ruleEffectiveFrom">Effective from</label
+          ><input
+            id="ruleEffectiveFrom"
+            type="date"
+            class="msx-input"
+            formControlName="effectiveFrom"
+          />
+        </div>
+        <div class="form-field">
+          <label for="ruleEffectiveTo">Effective to</label
+          ><input
+            id="ruleEffectiveTo"
+            type="date"
+            class="msx-input"
+            formControlName="effectiveTo"
+          />
+        </div>
+        <label class="checkbox-field"
+          ><input type="checkbox" formControlName="requiresApproval" /> Requires approval</label
+        ><label class="checkbox-field"
+          ><input type="checkbox" formControlName="isActive" /> Active</label
+        >
+        <div class="action-row form-field--full">
+          <button type="submit" class="msx-button msx-button--primary" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save rule' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading discount rules..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rule</th>
+              <th>Channel</th>
+              <th>Scope</th>
+              <th>Discount</th>
+              <th>Effective Period</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.standardDiscountRuleID) {
+              <tr>
+                <td>
+                  <strong>{{ item.ruleName }}</strong
+                  ><br /><span class="muted-text">ID {{ item.standardDiscountRuleID }}</span>
+                </td>
+                <td>{{ channelLabel(item.channel) }}</td>
+                <td>
+                  Segment {{ item.clientSegmentID ?? 'Any' }}, SKU {{ item.skuID ?? 'Any' }},
+                  Category {{ item.productCategoryID ?? 'Any' }}
+                </td>
+                <td>
+                  {{ item.maxDiscountPercent | number: '1.2-2' }}%
+                  @if (item.requiresApproval) {
+                    <span class="muted-text">(approval)</span>
+                  }
+                </td>
+                <td>{{ item.effectiveFrom }} to {{ item.effectiveTo || 'Open ended' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="item.isActive ? 'Active' : 'Inactive'"
+                    [tone]="item.isActive ? 'success' : 'neutral'"
+                  />
+                </td>
+                <td>
+                  <div class="action-row">
+                    @if (canManage()) {
+                      <button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="edit(item)"
+                      >
+                        Edit</button
+                      ><button
+                        type="button"
+                        class="msx-button msx-button--secondary"
+                        (click)="toggleStatus(item)"
+                      >
+                        {{ item.isActive ? 'Deactivate' : 'Activate' }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">No discount rules were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+
+  <div class="feature-card">
+    <div class="feature-card__header">
+      <div>
+        <h2>Price Resolver</h2>
+        <p class="muted-text">
+          Validate the effective price and maximum discount for a proposed line.
+        </p>
+      </div>
+    </div>
+    <form class="form-grid" [formGroup]="resolverForm" (ngSubmit)="resolvePrice()">
+      <div class="form-field">
+        <label for="resolverSku">SKU ID</label
+        ><input id="resolverSku" type="number" min="1" class="msx-input" formControlName="skuID" />
+      </div>
+      <div class="form-field">
+        <label for="resolverChannel">Channel</label
+        ><select id="resolverChannel" class="msx-input" formControlName="channel">
+          @for (option of channelOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="resolverSegment">Client segment ID</label
+        ><input
+          id="resolverSegment"
+          type="number"
+          min="1"
+          class="msx-input"
+          formControlName="clientSegmentID"
+        />
+      </div>
+      <div class="form-field">
+        <label for="resolverQuantity">Quantity</label
+        ><input
+          id="resolverQuantity"
+          type="number"
+          min="0.01"
+          step="0.01"
+          class="msx-input"
+          formControlName="quantity"
+        />
+      </div>
+      <div class="form-field">
+        <label for="resolverDate">Price date</label
+        ><input id="resolverDate" type="date" class="msx-input" formControlName="priceDate" />
+      </div>
+      <div class="action-row form-field--full">
+        <button type="submit" class="msx-button msx-button--secondary">Resolve price</button>
+      </div>
+    </form>
+    @if (resolvedPrice(); as price) {
+      <div class="feature-card feature-card--half">
+        <strong>{{ price.currencyCode }} {{ price.unitPrice | number: '1.2-2' }}</strong>
+        <p class="muted-text">
+          Maximum discount: {{ price.effectiveMaximumDiscountPercent | number: '1.2-2' }}%. Approval
+          required: {{ price.requiresApproval ? 'Yes' : 'No' }}.
+        </p>
+      </div>
+    }
+  </div>
+</section>

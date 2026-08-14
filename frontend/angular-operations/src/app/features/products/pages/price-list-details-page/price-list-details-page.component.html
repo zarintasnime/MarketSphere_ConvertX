@@ -1,0 +1,196 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Product and Pricing"
+    [title]="isEdit() ? 'Price List Details' : 'Create Price List'"
+    subtitle="Define effective dates, channel scope, and SKU-level prices."
+    secondaryActionLabel="Back to price lists"
+    (secondaryAction)="router.navigate(['/products/price-lists'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading price list..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">{{ errorMessage() }}</p>
+      </div>
+    }
+    <div class="feature-card">
+      <form class="form-grid" [formGroup]="form">
+        <div class="form-field">
+          <label for="priceListCode">Price list code</label
+          ><input id="priceListCode" class="msx-input" formControlName="priceListCode" />
+        </div>
+        <div class="form-field">
+          <label for="priceListName">Price list name</label
+          ><input id="priceListName" class="msx-input" formControlName="priceListName" />
+        </div>
+        <div class="form-field">
+          <label for="priceListChannel">Channel</label
+          ><select id="priceListChannel" class="msx-input" formControlName="channel">
+            @for (option of channelOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="priceListSegment">Client segment ID</label
+          ><input
+            id="priceListSegment"
+            type="number"
+            min="1"
+            class="msx-input"
+            formControlName="clientSegmentID"
+          />
+        </div>
+        <div class="form-field">
+          <label for="effectiveFrom">Effective from</label
+          ><input
+            id="effectiveFrom"
+            type="date"
+            class="msx-input"
+            formControlName="effectiveFrom"
+          />
+        </div>
+        <div class="form-field">
+          <label for="effectiveTo">Effective to</label
+          ><input id="effectiveTo" type="date" class="msx-input" formControlName="effectiveTo" />
+        </div>
+        <div class="form-field">
+          <label for="currencyCode">Currency code</label
+          ><input
+            id="currencyCode"
+            class="msx-input"
+            maxlength="3"
+            formControlName="currencyCode"
+          />
+        </div>
+      </form>
+    </div>
+
+    @if (canManage()) {
+      <div class="feature-card">
+        <div class="feature-card__header">
+          <div>
+            <h2>Add price item</h2>
+            <p class="muted-text">Adding the same SKU again replaces its pending row.</p>
+          </div>
+        </div>
+        <form class="form-grid" [formGroup]="itemForm" (ngSubmit)="addItem()">
+          <div class="form-field">
+            <label for="priceSku">SKU</label
+            ><select id="priceSku" class="msx-input" formControlName="skuID">
+              <option [ngValue]="0">Select SKU</option>
+              @for (item of skuOptions(); track item.skuID) {
+                <option [ngValue]="item.skuID">{{ item.skuCode }} - {{ item.skuName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="unitPrice">Unit price</label
+            ><input
+              id="unitPrice"
+              type="number"
+              min="0.01"
+              step="0.01"
+              class="msx-input"
+              formControlName="unitPrice"
+            />
+          </div>
+          <div class="form-field">
+            <label for="maximumDiscount">Maximum discount %</label
+            ><input
+              id="maximumDiscount"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              class="msx-input"
+              formControlName="maximumDiscountPercent"
+            />
+          </div>
+          <div class="form-field">
+            <label for="minimumQuantity">Minimum quantity</label
+            ><input
+              id="minimumQuantity"
+              type="number"
+              min="0"
+              step="0.01"
+              class="msx-input"
+              formControlName="minimumOrderQuantity"
+            />
+          </div>
+          <div class="action-row form-field--full">
+            <button type="submit" class="msx-button msx-button--secondary">Add item</button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <div class="feature-card">
+      <div class="feature-card__header">
+        <h2>Price items</h2>
+        <strong>{{ items().length }} item(s)</strong>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Unit Price</th>
+              <th>Max Discount</th>
+              <th>Minimum Quantity</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.skuID) {
+              <tr>
+                <td>
+                  <strong>{{ item.skuName }}</strong
+                  ><br /><span class="muted-text">{{ item.skuCode }}</span>
+                </td>
+                <td>{{ item.unitPrice | number: '1.2-2' }}</td>
+                <td>{{ item.maximumDiscountPercent | number: '1.2-2' }}%</td>
+                <td>{{ item.minimumOrderQuantity ?? 'None' }}</td>
+                <td>
+                  @if (canManage()) {
+                    <button
+                      type="button"
+                      class="msx-button msx-button--secondary"
+                      (click)="removeItem(item.skuID)"
+                    >
+                      Remove
+                    </button>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-row">Add at least one SKU price.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (canManage()) {
+      <div class="action-row">
+        <button
+          type="button"
+          class="msx-button msx-button--primary"
+          [disabled]="saving()"
+          (click)="save()"
+        >
+          {{ saving() ? 'Saving...' : 'Save price list' }}</button
+        ><button
+          type="button"
+          class="msx-button msx-button--secondary"
+          (click)="router.navigate(['/products/price-lists'])"
+        >
+          Cancel
+        </button>
+      </div>
+    }
+  }
+</section>

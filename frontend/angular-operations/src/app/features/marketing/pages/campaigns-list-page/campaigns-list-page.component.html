@@ -1,0 +1,114 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Marketing"
+    title="Campaigns"
+    subtitle="Plan, approve, activate, and measure trade marketing campaigns."
+  />
+  <div class="feature-card toolbar">
+    <form class="toolbar__search" (ngSubmit)="applySearch()">
+      <input
+        class="msx-input"
+        name="search"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        placeholder="Search by campaign code or title"
+      /><button class="msx-button msx-button--secondary" type="submit">Search</button>
+    </form>
+    @if (canManage()) {
+      <a class="msx-button msx-button--primary" routerLink="/marketing/campaigns/new"
+        >Create campaign</a
+      >
+    }
+  </div>
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+  @if (loading()) {
+    <app-loading-panel message="Loading campaigns..." />
+  } @else {
+    <div class="feature-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Campaign</th>
+              <th>Period</th>
+              <th>Channel</th>
+              <th>Budget</th>
+              <th>Expense</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.campaignID) {
+              <tr>
+                <td>{{ item.campaignCode }}</td>
+                <td>
+                  <a [routerLink]="['/marketing/campaigns', item.campaignID]"
+                    ><strong>{{ item.campaignTitle }}</strong></a
+                  >
+                </td>
+                <td>{{ item.startDate }} - {{ item.endDate }}</td>
+                <td>{{ channelLabel(item.channel) }}</td>
+                <td>{{ item.budget.toFixed(2) }}</td>
+                <td>{{ item.actualExpense.toFixed(2) }}</td>
+                <td>
+                  <app-status-badge [label]="statusLabel(item.status)" [tone]="tone(item.status)" />
+                </td>
+                <td>
+                  <div class="action-row">
+                    <a
+                      class="msx-button msx-button--secondary"
+                      [routerLink]="['/marketing/campaigns', item.campaignID]"
+                      >Open</a
+                    >
+                    @if (canManage()) {
+                      <a
+                        class="msx-button msx-button--secondary"
+                        [routerLink]="['/marketing/campaigns', item.campaignID, 'edit']"
+                        >Edit</a
+                      >
+                    }
+                    @if (canApprove() && item.status === 1) {
+                      <button
+                        type="button"
+                        class="msx-button msx-button--primary"
+                        (click)="changeStatus(item, 2)"
+                      >
+                        Approve
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">No campaigns were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-row">
+        <button
+          class="msx-button msx-button--secondary"
+          [disabled]="result().pageNumber <= 1"
+          (click)="load(result().pageNumber - 1)"
+        >
+          Previous</button
+        ><span>Page {{ result().pageNumber }} of {{ result().totalPages || 1 }}</span
+        ><button
+          class="msx-button msx-button--secondary"
+          [disabled]="result().pageNumber >= result().totalPages"
+          (click)="load(result().pageNumber + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  }
+</section>

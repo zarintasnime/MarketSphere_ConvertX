@@ -1,0 +1,419 @@
+<section class="feature-page">
+  @if (loading()) {
+    <app-loading-panel message="Loading lead details..." />
+  } @else if (lead(); as item) {
+    <app-page-header
+      eyebrow="CRM"
+      [title]="item.leadName"
+      [subtitle]="item.leadCode + ' · ' + sourceLabel(item.source)"
+      [primaryActionLabel]="canManage() ? 'Edit lead' : ''"
+      secondaryActionLabel="Back to leads"
+      (primaryAction)="router.navigate(['/crm/leads', item.leadID, 'edit'])"
+      (secondaryAction)="router.navigate(['/crm/leads'])"
+    />
+
+    @if (errorMessage()) {
+      <div class="feature-card">
+        <p class="error-message">
+          {{ errorMessage() }}
+        </p>
+      </div>
+    }
+
+    <div class="feature-grid lead-details__summary-grid">
+      <div class="feature-card feature-card--half">
+        <h2>Qualification</h2>
+
+        <p>
+          <strong>Status:</strong>
+          {{ statusLabel(item.status) }}
+          <br />
+
+          <strong>Score:</strong>
+          {{ item.currentScore }}
+          <br />
+
+          <strong>Temperature:</strong>
+          {{ temperatureLabel(item.temperature) }}
+          <br />
+
+          <strong>Estimated value:</strong>
+          {{ item.estimatedValue ?? 'Not set' }}
+          <br />
+
+          <strong>Product interest:</strong>
+          {{ item.productInterest || 'Not recorded' }}
+        </p>
+
+        @if (canManage()) {
+          <button
+            type="button"
+            class="msx-button msx-button--secondary"
+            [disabled]="busy()"
+            (click)="recalculateScore()"
+          >
+            Recalculate score
+          </button>
+        }
+      </div>
+
+      <div class="feature-card feature-card--half">
+        <h2>Contact and Assignment</h2>
+
+        <p>
+          <strong>Business:</strong>
+          {{ item.businessName || 'Individual' }}
+          <br />
+
+          <strong>Phone:</strong>
+          {{ item.phone || 'Not provided' }}
+          <br />
+
+          <strong>Email:</strong>
+          {{ item.email || 'Not provided' }}
+          <br />
+
+          <strong>Employee ID:</strong>
+          {{ item.assignedEmployeeID ?? 'Unassigned' }}
+          <br />
+
+          <strong>Next follow-up:</strong>
+          {{ item.nextFollowUpAt ? (item.nextFollowUpAt | date: 'medium') : 'Not scheduled' }}
+        </p>
+      </div>
+    </div>
+
+    @if (score(); as scoreResult) {
+      <div class="feature-card">
+        <h2>Latest Score Result</h2>
+
+        <p>
+          Previous: {{ scoreResult.previousScore }} · Current: {{ scoreResult.currentScore }}
+          · Rules:
+          {{ scoreResult.appliedRules.join(', ') || 'No rules applied' }}
+        </p>
+      </div>
+    }
+
+    @if (canManage()) {
+      <div class="feature-grid lead-details__action-grid">
+        <form
+          class="feature-card feature-card--half form-grid"
+          [formGroup]="statusForm"
+          (ngSubmit)="changeStatus()"
+        >
+          <h2 class="form-field--full">Change Lead Status</h2>
+
+          <div class="form-field form-field--full">
+            <label for="lead-status"> Status </label>
+
+            <select id="lead-status" class="msx-input" formControlName="status">
+              @for (option of statusOptions; track option.value) {
+                <option [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field form-field--full">
+            <label for="lead-lost-reason"> Lost reason </label>
+
+            <input id="lead-lost-reason" class="msx-input" formControlName="lostReason" />
+          </div>
+
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--secondary" type="submit" [disabled]="busy()">
+              Update status
+            </button>
+          </div>
+        </form>
+
+        <form
+          class="feature-card feature-card--half form-grid"
+          [formGroup]="conversionForm"
+          (ngSubmit)="convertToClient()"
+        >
+          <h2 class="form-field--full">Convert to Client</h2>
+
+          <div class="form-field form-field--full">
+            <label for="conversion-client-code"> Client code </label>
+
+            <input id="conversion-client-code" class="msx-input" formControlName="clientCode" />
+          </div>
+
+          <div class="form-field form-field--full">
+            <label for="conversion-client-type"> Client type </label>
+
+            <select id="conversion-client-type" class="msx-input" formControlName="clientType">
+              @for (option of clientTypeOptions; track option.value) {
+                <option [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field form-field--full">
+            <label for="conversion-channel"> Channel </label>
+
+            <select id="conversion-channel" class="msx-input" formControlName="channel">
+              @for (option of channelOptions; track option.value) {
+                <option [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field form-field--full">
+            <label for="conversion-address"> Address </label>
+
+            <textarea
+              id="conversion-address"
+              rows="3"
+              class="msx-input"
+              formControlName="address"
+            ></textarea>
+          </div>
+
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--primary" type="submit" [disabled]="busy()">
+              Convert lead
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <div class="feature-card">
+      <h2>Duplicate Candidates</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Entity</th>
+              <th>Name</th>
+              <th>Match</th>
+              <th>Reasons</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (duplicate of duplicates(); track duplicate.entityType + duplicate.entityID) {
+              <tr>
+                <td>
+                  {{ duplicate.entityType }}
+                  #{{ duplicate.entityID }}
+                </td>
+
+                <td>
+                  {{ duplicate.displayName }}
+                </td>
+
+                <td>
+                  {{ duplicate.matchScore | number: '1.0-2' }}
+                </td>
+
+                <td>
+                  {{ duplicate.reasons.join(', ') }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-row">No duplicate candidates were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (reviews().length > 0) {
+      <div class="feature-card">
+        <h2>Duplicate Reviews</h2>
+
+        @for (review of reviews(); track review.duplicateReviewCaseID) {
+          <div class="toolbar">
+            <span>
+              Case {{ review.duplicateReviewCaseID }}:
+              {{ review.sourceEntityType }}
+              #{{ review.sourceEntityID }}
+              vs
+              {{ review.matchedEntityType }}
+              #{{ review.matchedEntityID }}
+            </span>
+
+            @if (canManageDuplicates()) {
+              <div class="action-row">
+                <button
+                  class="msx-button msx-button--secondary"
+                  type="button"
+                  [disabled]="busy()"
+                  (click)="resolveReview(review, 1)"
+                >
+                  Not duplicate
+                </button>
+
+                <button
+                  class="msx-button msx-button--secondary"
+                  type="button"
+                  [disabled]="busy()"
+                  (click)="resolveReview(review, 4)"
+                >
+                  Keep separate
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <div class="feature-card">
+      <h2>Activity Timeline</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Subject</th>
+              <th>Status</th>
+              <th>Outcome</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (activity of activities(); track activity.crmActivityID) {
+              <tr>
+                <td>
+                  {{ activity.activityAt | date: 'medium' }}
+                </td>
+
+                <td>
+                  {{ activityTypeLabel(activity.activityType) }}
+                </td>
+
+                <td>
+                  {{ activity.subject }}
+                </td>
+
+                <td>
+                  {{ activity.activityStatus }}
+                </td>
+
+                <td>
+                  {{ activity.outcome || '—' }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-row">No activities are recorded.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (canManageActivities()) {
+        <form class="form-grid" [formGroup]="activityForm" (ngSubmit)="addActivity()">
+          <div class="form-field">
+            <label for="activity-type"> Activity type </label>
+
+            <select id="activity-type" class="msx-input" formControlName="activityType">
+              @for (option of activityTypeOptions; track option.value) {
+                <option [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="activity-status"> Status </label>
+
+            <select id="activity-status" class="msx-input" formControlName="activityStatus">
+              @for (option of activityStatusOptions; track option.value) {
+                <option [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="activity-subject"> Subject </label>
+
+            <input id="activity-subject" class="msx-input" formControlName="subject" />
+          </div>
+
+          <div class="form-field">
+            <label for="activity-time"> Activity time </label>
+
+            <input
+              id="activity-time"
+              type="datetime-local"
+              class="msx-input"
+              formControlName="activityAt"
+            />
+          </div>
+
+          <div class="form-field form-field--full">
+            <label for="activity-details"> Details </label>
+
+            <textarea
+              id="activity-details"
+              rows="3"
+              class="msx-input"
+              formControlName="details"
+            ></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="activity-outcome"> Outcome </label>
+
+            <input id="activity-outcome" class="msx-input" formControlName="outcome" />
+          </div>
+
+          <div class="form-field">
+            <label for="activity-next-action"> Next action </label>
+
+            <input
+              id="activity-next-action"
+              type="datetime-local"
+              class="msx-input"
+              formControlName="nextActionAt"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="activity-employee-id"> Performed by employee ID </label>
+
+            <input
+              id="activity-employee-id"
+              type="number"
+              min="1"
+              class="msx-input"
+              formControlName="performedByEmployeeID"
+            />
+          </div>
+
+          <div class="action-row form-field--full">
+            <button class="msx-button msx-button--secondary" type="submit" [disabled]="busy()">
+              Add activity
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  } @else {
+    <div class="feature-card">
+      <p class="error-message">
+        {{ errorMessage() || 'Lead could not be loaded.' }}
+      </p>
+    </div>
+  }
+</section>

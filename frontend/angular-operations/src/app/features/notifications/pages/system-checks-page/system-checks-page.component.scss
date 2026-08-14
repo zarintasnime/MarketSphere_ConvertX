@@ -1,0 +1,119 @@
+@use '../../../../styles/feature-page' as feature;
+@include feature.page;
+
+.system-check-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--msx-radius-lg);
+  padding: 1.15rem;
+  background: #eff6ff;
+}
+.system-check-intro h2 {
+  margin: 0;
+  color: #17335c;
+}
+.system-check-intro p {
+  max-width: 52rem;
+  margin: 0.45rem 0 0;
+  color: #475569;
+  line-height: 1.55;
+}
+.system-check-intro button {
+  flex: 0 0 auto;
+}
+.alert {
+  margin: 0 0 1rem;
+  border-radius: 0.65rem;
+  padding: 0.8rem 1rem;
+  font-weight: 700;
+}
+.alert.error {
+  color: #991b1b;
+  background: #fef2f2;
+}
+.alert.success {
+  color: #166534;
+  background: #f0fdf4;
+}
+.run-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.run-summary article {
+  border: 1px solid var(--msx-border-color);
+  border-radius: var(--msx-radius-lg);
+  padding: 1rem;
+  background: var(--msx-surface);
+  box-shadow: var(--msx-shadow-sm);
+}
+.run-summary span {
+  display: block;
+  color: var(--msx-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.run-summary strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--msx-color-primary-800);
+  font-size: 1.25rem;
+}
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.check-card {
+  border: 1px solid var(--msx-border-color);
+  border-radius: var(--msx-radius-lg);
+  padding: 1rem;
+  background: var(--msx-surface);
+  box-shadow: var(--msx-shadow-sm);
+}
+.check-card__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.check-card h2 {
+  margin: 0.35rem 0 0;
+  color: var(--msx-text-primary);
+  font-size: 1.05rem;
+}
+.check-card p {
+  margin: 0.8rem 0;
+  color: var(--msx-text-secondary);
+  line-height: 1.5;
+}
+.check-card small {
+  color: var(--msx-text-secondary);
+}
+.check-code {
+  color: var(--msx-color-primary-700);
+  font-family: 'Liberation Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+@media (max-width: 780px) {
+  .system-check-intro {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .run-summary,
+  .check-grid {
+    grid-template-columns: 1fr;
+  }
+}

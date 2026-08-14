@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+.field-page {
+  display: grid;
+  gap: 1rem;
+}
+.field-page__heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.field-page__heading h1 {
+  margin: 0;
+  color: #17335c;
+  font-size: 1.45rem;
+}
+.field-page__heading p {
+  margin: 0.3rem 0 0;
+  color: #64748b;
+}
+.field-unread-count {
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  color: #1d4ed8;
+  background: #dbeafe;
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.field-card {
+  padding: 1rem;
+  border: 1px solid #dce4ee;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 8px 22px rgb(15 23 42 / 0.06);
+}
+.field-list {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.field-list li {
+  padding: 0.9rem;
+  border: 1px solid #e2e8f0;
+  border-left: 0.3rem solid #cbd5e1;
+  border-radius: 0.85rem;
+  background: #fff;
+}
+.field-list li.field-list__item--unread {
+  border-left-color: #1f58a8;
+  background: #f8fbff;
+}
+.field-notification__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.field-notification__heading > div {
+  display: grid;
+  gap: 0.35rem;
+}
+.field-notification__heading time {
+  color: #64748b;
+  font-size: 0.72rem;
+}
+.field-list p {
+  color: #475569;
+  line-height: 1.5;
+}
+.field-priority {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.22rem 0.5rem;
+  color: #334155;
+  background: #e2e8f0;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+.field-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.field-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.7rem;
+  padding: 0.65rem 0.9rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: #fff;
+  background: #1f58a8;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+.field-button--secondary {
+  color: #17335c;
+  background: #eaf1fb;
+}
+.field-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.field-error {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.7rem;
+  color: #b42318;
+  background: #fff1f0;
+}
+@media (max-width: 560px) {
+  .field-page__heading,
+  .field-notification__heading {
+    display: grid;
+  }
+}

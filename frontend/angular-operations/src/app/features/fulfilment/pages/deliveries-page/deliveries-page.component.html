@@ -1,0 +1,117 @@
+<app-page-header
+  eyebrow="Fulfilment"
+  title="Deliveries"
+  subtitle="Create deliveries from verified pick lists and monitor dispatch, partial delivery, failure, and rescheduling."
+  primaryActionLabel="New delivery"
+  (primaryAction)="showCreate = !showCreate"
+/>
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (showCreate) {
+  <section class="section-card">
+    <form [formGroup]="form" (ngSubmit)="create()">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Delivery number</label><input formControlName="deliveryNo" />
+        </div>
+        <div class="form-field">
+          <label>Pick list</label
+          ><select
+            formControlName="pickListID"
+            #pickSelect
+            (change)="selectPickList(pickSelect.value)"
+          >
+            <option [ngValue]="0">Select pick list</option>
+            @for (pick of pickLists(); track pick.pickListID) {
+              <option [ngValue]="pick.pickListID">
+                {{ pick.pickListNo }} · Order #{{ pick.orderID }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Order ID</label><input type="number" formControlName="orderID" readonly />
+        </div>
+        <div class="form-field">
+          <label>Invoice ID</label><input type="number" formControlName="invoiceID" />
+        </div>
+        <div class="form-field">
+          <label>Warehouse</label
+          ><select formControlName="warehouseID">
+            <option [ngValue]="0">Select warehouse</option>
+            @for (warehouse of warehouses(); track warehouse.warehouseID) {
+              <option [ngValue]="warehouse.warehouseID">{{ warehouse.warehouseName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Planned delivery date</label
+          ><input type="date" formControlName="plannedDeliveryDate" />
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit">Create delivery</button
+        ><button type="button" class="secondary" (click)="showCreate = false">Cancel</button>
+      </div>
+    </form>
+  </section>
+}
+<section class="section-card">
+  <div class="filters">
+    <input
+      [(ngModel)]="search"
+      placeholder="Search delivery number"
+      (keyup.enter)="load(1)"
+    /><button type="button" (click)="load(1)">Search</button>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading deliveries..." />
+  } @else if (!rows().length) {
+    <app-empty-state title="No deliveries found" />
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Delivery</th>
+            <th>Order</th>
+            <th>Invoice</th>
+            <th>Pick list</th>
+            <th>Planned</th>
+            <th>Dispatched</th>
+            <th>Delivered</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of rows(); track item.deliveryID) {
+            <tr>
+              <td>{{ item.deliveryNo }}</td>
+              <td>#{{ item.orderID }}</td>
+              <td>{{ item.invoiceID || '—' }}</td>
+              <td>{{ item.pickListID || '—' }}</td>
+              <td>
+                {{
+                  item.plannedDeliveryDate ? (item.plannedDeliveryDate | date: 'mediumDate') : '—'
+                }}
+              </td>
+              <td>{{ item.dispatchDate ? (item.dispatchDate | date: 'short') : '—' }}</td>
+              <td>{{ item.deliveredAt ? (item.deliveredAt | date: 'short') : '—' }}</td>
+              <td><app-status-badge [label]="label(item.status)" [tone]="tone(item.status)" /></td>
+              <td><a [routerLink]="['/fulfilment/deliveries', item.deliveryID]">Open</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination
+      [pageNumber]="pageNumber"
+      [pageSize]="pageSize"
+      [totalCount]="totalCount()"
+      [totalPages]="totalPages()"
+      (pageChange)="load($event)"
+    />
+  }
+</section>

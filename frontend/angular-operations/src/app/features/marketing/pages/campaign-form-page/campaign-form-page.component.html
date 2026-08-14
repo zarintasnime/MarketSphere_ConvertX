@@ -1,0 +1,63 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Marketing"
+    [title]="campaignID ? 'Edit Campaign' : 'Create Campaign'"
+    subtitle="Define the campaign period, commercial objective, channel, and approved budget."
+  />
+  @if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </div>
+  }
+  <div class="feature-card">
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-field">
+        <label>Campaign code</label><input class="msx-input" formControlName="campaignCode" />
+      </div>
+      <div class="form-field">
+        <label>Campaign title</label><input class="msx-input" formControlName="campaignTitle" />
+      </div>
+      <div class="form-field form-field--full">
+        <label>Objective</label
+        ><textarea class="msx-input" rows="4" formControlName="objective"></textarea>
+      </div>
+      <div class="form-field">
+        <label>Budget</label
+        ><input class="msx-input" type="number" min="0" step="0.01" formControlName="budget" />
+      </div>
+      <div class="form-field">
+        <label>Channel</label
+        ><select class="msx-input" formControlName="channel">
+          @for (option of channelOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Start date</label><input class="msx-input" type="date" formControlName="startDate" />
+      </div>
+      <div class="form-field">
+        <label>End date</label><input class="msx-input" type="date" formControlName="endDate" />
+      </div>
+      <div class="form-field">
+        <label>Created by employee ID</label
+        ><input class="msx-input" type="number" formControlName="createdByEmployeeID" />
+      </div>
+      <div class="action-row form-field--full">
+        <button
+          class="msx-button msx-button--primary"
+          type="submit"
+          [disabled]="saving() || loading()"
+        >
+          {{ saving() ? 'Saving...' : 'Save campaign' }}</button
+        ><button
+          class="msx-button msx-button--secondary"
+          type="button"
+          (click)="router.navigate(['/marketing/campaigns'])"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

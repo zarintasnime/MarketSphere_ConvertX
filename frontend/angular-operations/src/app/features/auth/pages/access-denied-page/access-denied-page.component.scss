@@ -1,0 +1,68 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.access-page {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at center, rgb(51 140 255 / 10%), transparent 24rem),
+    var(--msx-page-background);
+  padding: var(--msx-space-6);
+}
+
+.access-card {
+  width: min(100%, 36rem);
+  border: 1px solid var(--msx-border-color);
+  border-radius: var(--msx-radius-xl);
+  background: var(--msx-surface);
+  padding: clamp(2rem, 6vw, 4rem);
+  box-shadow: var(--msx-shadow-lg);
+  text-align: center;
+}
+
+.access-card__code {
+  display: block;
+  margin-bottom: var(--msx-space-4);
+  color: var(--msx-color-brand-700);
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.access-card__icon {
+  display: inline-flex;
+  width: 4.5rem;
+  height: 4.5rem;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--msx-space-5);
+  border-radius: 50%;
+  background: var(--msx-color-danger-50);
+  color: var(--msx-color-danger-700);
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.access-card h1 {
+  margin-bottom: var(--msx-space-3);
+  font-size: 2rem;
+  letter-spacing: -0.04em;
+}
+
+.access-card p {
+  max-width: 28rem;
+  margin: 0 auto;
+  color: var(--msx-text-secondary);
+}
+
+.access-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--msx-space-3);
+  margin-top: var(--msx-space-8);
+}

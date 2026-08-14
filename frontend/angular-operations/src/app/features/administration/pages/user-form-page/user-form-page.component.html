@@ -1,0 +1,73 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Administration"
+    [title]="isEdit() ? 'Edit user' : 'Create user'"
+    subtitle="Maintain account information and role membership."
+    secondaryActionLabel="Back"
+    (secondaryAction)="router.navigate(['/administration/users'])"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading user form..." />
+  } @else {
+    <form class="feature-card" [formGroup]="form" (ngSubmit)="save()">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="fullName">Full name</label
+          ><input id="fullName" class="msx-input" formControlName="fullName" />
+        </div>
+        <div class="form-field">
+          <label for="email">Email</label
+          ><input id="email" type="email" class="msx-input" formControlName="email" />
+        </div>
+        <div class="form-field">
+          <label for="phone">Phone</label
+          ><input id="phone" class="msx-input" formControlName="phone" />
+        </div>
+        @if (!isEdit()) {
+          <div class="form-field">
+            <label for="temporaryPassword">Temporary password</label
+            ><input
+              id="temporaryPassword"
+              type="password"
+              class="msx-input"
+              formControlName="temporaryPassword"
+            />
+          </div>
+          <label class="checkbox-field form-field--full"
+            ><input type="checkbox" formControlName="activateImmediately" /> Activate
+            immediately</label
+          >
+        }
+        <div class="form-field form-field--full">
+          <label>Roles</label>
+          @if (isEdit() && !canAssignRoles()) {
+            <p class="muted-text">
+              Your account can update the user profile but cannot change role membership.
+            </p>
+          }
+          <div class="permission-grid">
+            @for (role of roles(); track role.roleID) {
+              <label class="checkbox-field"
+                ><input
+                  type="checkbox"
+                  [checked]="isRoleSelected(role.roleID)"
+                  [disabled]="!canAssignRoles()"
+                  (change)="toggleRole(role.roleID, $any($event.target).checked)"
+                />
+                {{ role.roleName }} ({{ role.roleCode }})</label
+              >
+            }
+          </div>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="msx-button msx-button--primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Saving...' : 'Save user' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

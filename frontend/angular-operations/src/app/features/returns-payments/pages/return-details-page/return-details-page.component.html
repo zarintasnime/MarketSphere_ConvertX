@@ -1,0 +1,146 @@
+<app-page-header
+  eyebrow="Returns and Payments"
+  title="Return details"
+  subtitle="Approve quantities, inspect received stock, select disposition, and create credit or replacement outcomes."
+/>
+@if (loading()) {
+  <app-loading-panel message="Loading return details..." />
+}
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (success()) {
+  <div class="alert success">{{ success() }}</div>
+}
+@if (item(); as ret) {
+  <section class="section-card">
+    <div class="section-heading">
+      <div>
+        <h2>{{ ret.returnNo }}</h2>
+        <p>Client #{{ ret.clientID }} · Order #{{ ret.orderID }} · {{ ret.returnReason }}</p>
+      </div>
+      <app-status-badge [label]="statusLabel(ret.status)" [tone]="tone(ret.status)" />
+    </div>
+    <div class="metrics">
+      <div class="metric">
+        <span>Requested</span><strong>{{ ret.requestDate | date: 'mediumDate' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Invoice</span><strong>{{ ret.invoiceID || '—' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Delivery</span><strong>{{ ret.deliveryID || '—' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Complaint</span><strong>{{ ret.complaintID || '—' }}</strong>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Requested</th>
+            <th>Approved</th>
+            <th>Received</th>
+            <th>Condition</th>
+            <th>Disposition</th>
+            <th>Restock</th>
+            <th>Quarantine</th>
+            <th>Damage</th>
+            <th>Replace</th>
+            <th>Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of ret.items; track line.returnItemID) {
+            <tr>
+              <td>
+                {{ line.skuCode }}<br /><small>Batch {{ line.batchID || '—' }}</small>
+              </td>
+              <td>{{ line.requestedQuantity }}</td>
+              <td>
+                <input type="number" step="0.01" [(ngModel)]="value(line).approvedQuantity" />
+              </td>
+              <td>
+                <input type="number" step="0.01" [(ngModel)]="value(line).receivedQuantity" />
+              </td>
+              <td>
+                <select [(ngModel)]="value(line).conditionStatus">
+                  @for (entry of conditionOptions; track entry[0]) {
+                    <option [ngValue]="entry[1]">{{ entry[0] }}</option>
+                  }
+                </select>
+              </td>
+              <td>
+                <select [(ngModel)]="value(line).disposition">
+                  @for (entry of dispositionOptions; track entry[0]) {
+                    <option [ngValue]="entry[1]">{{ entry[0] }}</option>
+                  }
+                </select>
+              </td>
+              <td><input type="number" step="0.01" [(ngModel)]="value(line).restockQuantity" /></td>
+              <td>
+                <input type="number" step="0.01" [(ngModel)]="value(line).quarantineQuantity" />
+              </td>
+              <td><input type="number" step="0.01" [(ngModel)]="value(line).damageQuantity" /></td>
+              <td>
+                <input type="number" step="0.01" [(ngModel)]="value(line).replacementQuantity" />
+              </td>
+              <td><input type="number" step="0.01" [(ngModel)]="value(line).creditAmount" /></td>
+            </tr>
+            <tr>
+              <td colspan="11">
+                <input [(ngModel)]="value(line).inspectionResult" placeholder="Inspection result" />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (ret.status === 1 || ret.status === 2) {
+      <div class="actions">
+        <button type="button" (click)="approve()">Approve quantities</button>
+      </div>
+    }
+    @if ([3, 5, 6].includes(ret.status)) {
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Receiving warehouse</label
+          ><select [(ngModel)]="warehouseID">
+            <option [ngValue]="0">Select warehouse</option>
+            @for (warehouse of warehouses(); track warehouse.warehouseID) {
+              <option [ngValue]="warehouse.warehouseID">{{ warehouse.warehouseName }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Resolved by</label
+          ><select [(ngModel)]="resolvedByEmployeeID">
+            <option [ngValue]="0">Select employee</option>
+            @for (employee of employees(); track employee.employeeID) {
+              <option [ngValue]="employee.employeeID">
+                {{ employee.userFullName || employee.employeeCode }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Resolution type</label
+          ><select [(ngModel)]="resolutionType">
+            @for (entry of resolutionOptions; track entry[0]) {
+              <option [ngValue]="entry[1]">{{ entry[0] }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Credit note number</label><input [(ngModel)]="creditNoteNo" />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Resolution note</label><textarea rows="3" [(ngModel)]="resolutionNote"></textarea>
+        </div>
+      </div>
+      <div class="actions"><button type="button" (click)="resolve()">Resolve return</button></div>
+    }
+  </section>
+}

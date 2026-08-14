@@ -1,0 +1,65 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Operations"
+    title="Dashboard"
+    [subtitle]="'Welcome back, ' + (currentUser()?.fullName || 'User') + '.'"
+    primaryActionLabel="Refresh"
+    (primaryAction)="loadSummary()"
+  />
+
+  @if (loading()) {
+    <app-loading-panel message="Loading dashboard summary..." />
+  } @else if (errorMessage()) {
+    <div class="feature-card">
+      <p class="error-message">{{ errorMessage() }}</p>
+      <button class="msx-button msx-button--secondary" type="button" (click)="loadSummary()">
+        Try again
+      </button>
+    </div>
+  } @else if (summary(); as data) {
+    <div class="metrics-grid">
+      <app-metric-card
+        label="Users"
+        [value]="data.totalUsers"
+        [hint]="data.activeUsers + ' active'"
+        tone="brand"
+      />
+      <app-metric-card
+        label="Roles"
+        [value]="data.totalRoles"
+        [hint]="data.activeRoles + ' active'"
+        tone="info"
+      />
+      <app-metric-card
+        label="Employees"
+        [value]="data.totalEmployees"
+        [hint]="data.activeEmployees + ' active'"
+        tone="success"
+      />
+      <app-metric-card
+        label="Branches"
+        [value]="data.totalBranches"
+        [hint]="data.activeBranches + ' active'"
+        tone="warning"
+      />
+    </div>
+  }
+
+  <div class="feature-card">
+    <div class="feature-card__header">
+      <div>
+        <h2>Quick access</h2>
+        <p class="muted-text">Only pages allowed by your permissions are shown.</p>
+      </div>
+    </div>
+
+    <div class="quick-link-grid">
+      @for (link of visibleQuickLinks(); track link.route) {
+        <a class="quick-link" [routerLink]="link.route">
+          <strong>{{ link.label }}</strong>
+          <span>{{ link.description }}</span>
+        </a>
+      }
+    </div>
+  </div>
+</section>

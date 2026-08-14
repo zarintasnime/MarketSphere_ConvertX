@@ -1,0 +1,64 @@
+<section class="field-page">
+  <div class="field-page__heading">
+    <div>
+      <h1>Field Home</h1>
+      <p>Today’s assignments, visits, alerts, and active work.</p>
+    </div>
+    <button class="field-button field-button--secondary" type="button" (click)="load()">
+      Refresh
+    </button>
+  </div>
+  @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+  }
+  @if (loading()) {
+    <div class="field-card">Loading workspace...</div>
+  } @else if (summary(); as item) {
+    <div class="field-card">
+      <h2>{{ item.employeeName }}</h2>
+      <p>{{ item.designationName }} | {{ item.branchName }}</p>
+      <div class="field-metrics">
+        <div class="field-metric">
+          <span>Assigned clients</span><strong>{{ item.assignedClientCount }}</strong>
+        </div>
+        <div class="field-metric">
+          <span>Visits today</span><strong>{{ item.todayVisitCount }}</strong>
+        </div>
+        <div class="field-metric">
+          <span>Completed</span><strong>{{ item.completedVisitCount }}</strong>
+        </div>
+        <div class="field-metric">
+          <span>Unread alerts</span><strong>{{ item.unreadNotificationCount }}</strong>
+        </div>
+      </div>
+    </div>
+    @if (item.activeVisit) {
+      <div class="field-card">
+        <h2>Active visit</h2>
+        <p>
+          <strong>{{ item.activeVisit.clientName }}</strong> ({{ item.activeVisit.clientCode }})
+        </p>
+        <p>Checked in at {{ item.activeVisit.checkInAt }}</p>
+        <a class="field-button" routerLink="/field/active-visit">Open active visit</a>
+      </div>
+    } @else {
+      <div class="field-card">
+        <h2>No active visit</h2>
+        <p>Select an assigned client and start a visit with browser location capture.</p>
+        <a class="field-button" routerLink="/field/visit/check-in">Start a visit</a>
+      </div>
+    }
+    <div class="field-card">
+      <h2>Quick actions</h2>
+      <div class="field-actions">
+        <a class="field-button field-button--secondary" routerLink="/field/clients"
+          >Assigned clients</a
+        ><a class="field-button field-button--secondary" routerLink="/field/visits">Visit history</a
+        ><a class="field-button field-button--secondary" routerLink="/field/mt-po">Capture MT PO</a
+        ><a class="field-button field-button--secondary" routerLink="/field/bp-sell-out"
+          >Capture sell-out</a
+        >
+      </div>
+    </div>
+  }
+</section>

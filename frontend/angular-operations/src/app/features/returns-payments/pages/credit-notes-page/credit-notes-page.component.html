@@ -1,0 +1,61 @@
+<app-page-header
+  eyebrow="Returns and Payments"
+  title="Credit notes"
+  subtitle="Review credit-bearing return resolutions and the total credit amount posted by the backend return workflow."
+/>
+<div class="alert warning">
+  The current backend does not expose a standalone credit-note controller. This page is a read-only
+  register derived from resolved customer returns with Credit or Mixed resolution.
+</div>
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+<section class="section-card">
+  <div class="filters">
+    <input
+      [(ngModel)]="search"
+      placeholder="Search return reference"
+      (keyup.enter)="load()"
+    /><button type="button" (click)="load()">Search</button>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading credit resolutions..." />
+  } @else if (!rows().length) {
+    <app-empty-state title="No credit-bearing returns found" />
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Return</th>
+            <th>Client</th>
+            <th>Invoice</th>
+            <th>Resolved</th>
+            <th>Resolution</th>
+            <th>Credit amount</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of rows(); track item.returnRequestID) {
+            <tr>
+              <td>{{ item.returnNo }}</td>
+              <td>#{{ item.clientID }}</td>
+              <td>{{ item.invoiceID || '—' }}</td>
+              <td>{{ item.resolvedAt ? (item.resolvedAt | date: 'medium') : '—' }}</td>
+              <td>{{ resolutionLabel(item.resolutionType) }}</td>
+              <td>{{ item.totalCreditAmount | number: '1.2-2' }}</td>
+              <td>{{ statusLabel(item.status) }}</td>
+              <td>
+                <a [routerLink]="['/returns-payments/returns', item.returnRequestID]"
+                  >Open return</a
+                >
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

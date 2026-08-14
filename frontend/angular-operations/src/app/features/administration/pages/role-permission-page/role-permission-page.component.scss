@@ -1,0 +1,13 @@
+@use '../../../../styles/feature-page' as feature;
+@include feature.page;
+.permission-group {
+  display: grid;
+  gap: 0.7rem;
+}
+.permission-group .checkbox-field span {
+  display: grid;
+}
+.permission-group small {
+  display: block;
+  font-size: 0.73rem;
+}

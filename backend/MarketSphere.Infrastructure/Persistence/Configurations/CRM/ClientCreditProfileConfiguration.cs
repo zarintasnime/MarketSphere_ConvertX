@@ -1,0 +1,5 @@
+using MarketSphere.Domain.Entities.CRM;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+namespace MarketSphere.Infrastructure.Persistence.Configurations.CRM;
+public sealed class ClientCreditProfileConfiguration : IEntityTypeConfiguration<ClientCreditProfile> { public void Configure(EntityTypeBuilder<ClientCreditProfile> b) { b.ToTable("ClientCreditProfiles", t => { t.HasCheckConstraint("CK_ClientCreditProfiles_CreditLimit", "[CreditLimit] >= 0"); t.HasCheckConstraint("CK_ClientCreditProfiles_CreditDays", "[CreditDays] >= 0"); t.HasCheckConstraint("CK_ClientCreditProfiles_CurrentDue", "[CurrentDue] >= 0"); }); b.HasKey(x => x.ClientCreditProfileID); b.Property(x => x.CreditLimit).HasPrecision(18, 2); b.Property(x => x.CurrentDue).HasPrecision(18, 2); b.Property(x => x.BlockReason).HasMaxLength(500); b.HasIndex(x => x.ClientID).IsUnique(); b.HasOne(x => x.Client).WithOne(x => x.CreditProfile).HasForeignKey<ClientCreditProfile>(x => x.ClientID).OnDelete(DeleteBehavior.Restrict); } }

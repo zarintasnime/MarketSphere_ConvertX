@@ -1,0 +1,63 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Organization"
+    title="Company profile"
+    subtitle="Maintain the primary company record used by all business modules."
+    primaryActionLabel="Refresh"
+    (primaryAction)="load()"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading company profile..." />
+  } @else if (!company()) {
+    <div class="feature-card">
+      <p class="error-message">No company record was returned by the API.</p>
+    </div>
+  } @else {
+    <form class="feature-card" [formGroup]="form" (ngSubmit)="save()">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      @if (successMessage()) {
+        <p class="success-message">{{ successMessage() }}</p>
+      }
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Company code</label
+          ><input class="msx-input" [value]="company()?.companyCode || ''" disabled />
+        </div>
+        <div class="form-field">
+          <label for="companyName">Company name</label
+          ><input id="companyName" class="msx-input" formControlName="companyName" />
+        </div>
+        <div class="form-field">
+          <label for="tradeLicenseNo">Trade license</label
+          ><input id="tradeLicenseNo" class="msx-input" formControlName="tradeLicenseNo" />
+        </div>
+        <div class="form-field">
+          <label for="phone">Phone</label
+          ><input id="phone" class="msx-input" formControlName="phone" />
+        </div>
+        <div class="form-field">
+          <label for="email">Email</label
+          ><input id="email" type="email" class="msx-input" formControlName="email" />
+        </div>
+        <label class="checkbox-field"
+          ><input type="checkbox" formControlName="isActive" /> Active</label
+        >
+        <div class="form-field form-field--full">
+          <label for="address">Address</label
+          ><textarea id="address" rows="4" class="msx-input" formControlName="address"></textarea>
+        </div>
+      </div>
+      <div class="action-row">
+        <button
+          type="submit"
+          class="msx-button msx-button--primary"
+          [disabled]="saving() || !canManage()"
+        >
+          {{ saving() ? 'Saving...' : 'Save company' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

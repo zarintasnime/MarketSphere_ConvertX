@@ -1,0 +1,140 @@
+<app-page-header
+  eyebrow="Fulfilment"
+  title="Delivery details"
+  subtitle="Dispatch verified picks and record full, partial, failed, rescheduled, or cancelled delivery outcomes."
+/>
+@if (loading()) {
+  <app-loading-panel message="Loading delivery details..." />
+}
+@if (error()) {
+  <div class="alert error">{{ error() }}</div>
+}
+@if (success()) {
+  <div class="alert success">{{ success() }}</div>
+}
+@if (item(); as delivery) {
+  <section class="section-card">
+    <div class="section-heading">
+      <div>
+        <h2>{{ delivery.deliveryNo }}</h2>
+        <p>
+          Order #{{ delivery.orderID }} · Pick list #{{ delivery.pickListID }} · Warehouse #{{
+            delivery.warehouseID
+          }}
+        </p>
+      </div>
+      <app-status-badge [label]="label(delivery.status)" [tone]="tone(delivery.status)" />
+    </div>
+    <div class="metrics">
+      <div class="metric">
+        <span>Planned</span
+        ><strong>{{
+          delivery.plannedDeliveryDate ? (delivery.plannedDeliveryDate | date: 'mediumDate') : '—'
+        }}</strong>
+      </div>
+      <div class="metric">
+        <span>Dispatched</span
+        ><strong>{{
+          delivery.dispatchDate ? (delivery.dispatchDate | date: 'short') : '—'
+        }}</strong>
+      </div>
+      <div class="metric">
+        <span>Delivered</span
+        ><strong>{{ delivery.deliveredAt ? (delivery.deliveredAt | date: 'short') : '—' }}</strong>
+      </div>
+      <div class="metric">
+        <span>Delivery employee</span><strong>{{ delivery.deliveredByEmployeeID || '—' }}</strong>
+      </div>
+    </div>
+    @if (delivery.status === 1 || delivery.status === 2) {
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Delivered by</label
+          ><select [(ngModel)]="deliveredByEmployeeID">
+            <option [ngValue]="0">Select employee</option>
+            @for (employee of employees(); track employee.employeeID) {
+              <option [ngValue]="employee.employeeID">
+                {{ employee.userFullName || employee.employeeCode }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" (click)="dispatch()">Dispatch delivery</button>
+      </div>
+    }
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Batch</th>
+            <th>Dispatched</th>
+            <th>Delivered</th>
+            <th>Rejected</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of delivery.items; track line.deliveryItemID) {
+            <tr>
+              <td>{{ line.skuCode }}</td>
+              <td>{{ line.batchID || '—' }}</td>
+              <td>{{ line.quantityDispatched }}</td>
+              <td>
+                <input type="number" step="0.01" [(ngModel)]="value(line).quantityDelivered" />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  step="0.01"
+                  [(ngModel)]="value(line).quantityRejectedAtDelivery"
+                />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if ([3, 4, 6, 7].includes(delivery.status)) {
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Completion status</label
+          ><select [(ngModel)]="completionStatus">
+            @for (status of completionOptions; track status) {
+              <option [ngValue]="status">{{ label(status) }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Receiver name</label><input [(ngModel)]="receiverName" />
+        </div>
+        <div class="form-field">
+          <label>Receiver phone</label><input [(ngModel)]="receiverPhone" />
+        </div>
+        <div class="form-field">
+          <label>Rescheduled date</label><input type="date" [(ngModel)]="rescheduledDate" />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Failure reason</label><textarea rows="3" [(ngModel)]="failureReason"></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" (click)="complete()">Record delivery outcome</button>
+      </div>
+    }
+    @if (delivery.status === 4 || delivery.status === 5) {
+      <div class="actions">
+        <a
+          [routerLink]="['/returns-payments/returns']"
+          [queryParams]="{
+            deliveryID: delivery.deliveryID,
+            orderID: delivery.orderID,
+            invoiceID: delivery.invoiceID,
+          }"
+          >Create customer return</a
+        >
+      </div>
+    }
+  </section>
+}

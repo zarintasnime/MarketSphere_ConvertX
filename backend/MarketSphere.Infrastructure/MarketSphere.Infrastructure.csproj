@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.18">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.18" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarketSphere.Application\MarketSphere.Application.csproj" />
+    <ProjectReference Include="..\MarketSphere.Domain\MarketSphere.Domain.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <Folder Include="Identity\" />
+    <Folder Include="FileStorage\" />
+    <Folder Include="Persistence\Configurations\CRM\" />
+    <Folder Include="Persistence\Configurations\MarketingField\" />
+    <Folder Include="Persistence\Configurations\Inventory\" />
+    <Folder Include="Persistence\Configurations\KPI\" />
+    <Folder Include="Persistence\Configurations\Infrastructure\" />
+    <Folder Include="Persistence\Configurations\OrderFulfilment\" />
+    <Folder Include="Persistence\Configurations\Procurement\" />
+    <Folder Include="Persistence\Configurations\ProductPricing\" />
+    <Folder Include="Persistence\Configurations\OrganizationSecurity\" />
+    <Folder Include="Reports\" />
+  </ItemGroup>
+
+</Project>

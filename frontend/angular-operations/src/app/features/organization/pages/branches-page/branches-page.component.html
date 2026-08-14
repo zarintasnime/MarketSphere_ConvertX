@@ -1,0 +1,106 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="Organization"
+    title="Branches"
+    subtitle="Maintain branch master records for business transactions."
+    [primaryActionLabel]="canManage() ? 'New branch' : ''"
+    (primaryAction)="resetForm()"
+  />
+  @if (loading()) {
+    <app-loading-panel message="Loading branches..." />
+  } @else {
+    <div class="feature-grid">
+      <div class="feature-card feature-card--half">
+        <div class="feature-card__header"><h2>Branch list</h2></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Branch</th>
+                <th>Type</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (branch of branches(); track branch.branchID) {
+                <tr (click)="select(branch)">
+                  <td>
+                    <strong>{{ branch.branchName }}</strong
+                    ><br /><span class="muted-text">{{ branch.branchCode }}</span>
+                  </td>
+                  <td>{{ branchTypeName(branch.branchType) }}</td>
+                  <td>
+                    <app-status-badge
+                      [label]="branch.isActive ? 'Active' : 'Inactive'"
+                      [tone]="branch.isActive ? 'success' : 'neutral'"
+                    />
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="empty-row">No branches were found.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <form class="feature-card feature-card--half" [formGroup]="form" (ngSubmit)="save()">
+        <div class="feature-card__header">
+          <h2>{{ selectedID() ? 'Edit branch' : 'Create branch' }}</h2>
+        </div>
+        @if (errorMessage()) {
+          <p class="error-message">{{ errorMessage() }}</p>
+        }
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="companyID">Company</label
+            ><select id="companyID" class="msx-input" formControlName="companyID">
+              @for (company of companies(); track company.companyID) {
+                <option [ngValue]="company.companyID">{{ company.companyName }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="branchCode">Branch code</label
+            ><input id="branchCode" class="msx-input" formControlName="branchCode" />
+          </div>
+          <div class="form-field">
+            <label for="branchName">Branch name</label
+            ><input id="branchName" class="msx-input" formControlName="branchName" />
+          </div>
+          <div class="form-field">
+            <label for="branchType">Branch type</label
+            ><select id="branchType" class="msx-input" formControlName="branchType">
+              @for (item of branchTypes; track item) {
+                <option [ngValue]="item">{{ branchTypeName(item) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="phone">Phone</label
+            ><input id="phone" class="msx-input" formControlName="phone" />
+          </div>
+          <label class="checkbox-field"
+            ><input type="checkbox" formControlName="isActive" /> Active</label
+          >
+          <div class="form-field form-field--full">
+            <label for="address">Address</label
+            ><textarea id="address" rows="3" class="msx-input" formControlName="address"></textarea>
+          </div>
+        </div>
+        <div class="action-row">
+          <button
+            type="submit"
+            class="msx-button msx-button--primary"
+            [disabled]="saving() || !canManage()"
+          >
+            {{ saving() ? 'Saving...' : 'Save branch' }}</button
+          ><button type="button" class="msx-button msx-button--secondary" (click)="resetForm()">
+            Clear
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</section>

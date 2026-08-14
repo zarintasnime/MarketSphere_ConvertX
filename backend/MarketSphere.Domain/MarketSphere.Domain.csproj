@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Entities\CRM\" />
+    <Folder Include="Entities\MarketingField\" />
+    <Folder Include="Entities\Inventory\" />
+    <Folder Include="Entities\KPI\" />
+    <Folder Include="Entities\Infrastructure\" />
+    <Folder Include="Entities\OrderFulfilment\" />
+    <Folder Include="Entities\Procurement\" />
+    <Folder Include="Entities\ProductPricing\" />
+    <Folder Include="Entities\OrganizationSecurity\" />
+  </ItemGroup>
+
+</Project>

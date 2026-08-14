@@ -1,0 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MarketSphere.Domain.Entities.Infrastructure;
+namespace MarketSphere.Infrastructure.Persistence.Configurations.Infrastructure;
+public sealed class NotificationConfiguration : IEntityTypeConfiguration<Notification> { public void Configure(EntityTypeBuilder<Notification> builder) { builder.ToTable("Notifications"); builder.HasKey(x => x.NotificationID); builder.Property(x => x.NotificationType).HasConversion<int>(); builder.Property(x => x.Priority).HasConversion<int>(); builder.Property(x => x.Title).HasMaxLength(200).IsRequired(); builder.Property(x => x.Message).HasMaxLength(2000).IsRequired(); builder.Property(x => x.ReferenceType).HasMaxLength(100); builder.HasIndex(x => new { x.UserID, x.IsRead, x.CreatedAt }); builder.HasIndex(x => new { x.ReferenceType, x.ReferenceID, x.Title }); builder.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserID).OnDelete(DeleteBehavior.Restrict); } }

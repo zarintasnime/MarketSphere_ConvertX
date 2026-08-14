@@ -1,0 +1,93 @@
+<section class="field-page">
+  <div class="field-page__heading">
+    <div>
+      <h1>Capture MT PO</h1>
+      <p>Create and submit a modern-trade purchase order from the web field workspace.</p>
+    </div>
+  </div>
+  @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+  }
+  @if (successMessage()) {
+    <p class="field-success">{{ successMessage() }}</p>
+  }
+  <div class="field-card">
+    <h2>PO header</h2>
+    <form class="field-grid" [formGroup]="headerForm">
+      <div class="field-control">
+        <label>Client ID</label
+        ><input class="field-input" type="number" formControlName="clientID" />
+      </div>
+      <div class="field-control">
+        <label>PO number</label><input class="field-input" formControlName="poNumber" />
+      </div>
+      <div class="field-control">
+        <label>PO date</label><input class="field-input" type="date" formControlName="poDate" />
+      </div>
+      <div class="field-control">
+        <label>Received date</label
+        ><input class="field-input" type="date" formControlName="receivedDate" />
+      </div>
+      <div class="field-control">
+        <label>Requested delivery date</label
+        ><input class="field-input" type="date" formControlName="requestedDeliveryDate" />
+      </div>
+    </form>
+  </div>
+  <div class="field-card">
+    <h2>Add item</h2>
+    <form class="field-grid" [formGroup]="itemForm" (ngSubmit)="addItem()">
+      <div class="field-control">
+        <label>External code</label><input class="field-input" formControlName="externalItemCode" />
+      </div>
+      <div class="field-control">
+        <label>External item name</label
+        ><input class="field-input" formControlName="externalItemName" />
+      </div>
+      <div class="field-control">
+        <label>Mapped SKU ID</label
+        ><input class="field-input" type="number" formControlName="skuID" />
+      </div>
+      <div class="field-control">
+        <label>Quantity</label
+        ><input class="field-input" type="number" step="0.01" formControlName="orderedQuantity" />
+      </div>
+      <div class="field-control">
+        <label>Unit price</label
+        ><input class="field-input" type="number" step="0.01" formControlName="agreedUnitPrice" />
+      </div>
+      <div class="field-control">
+        <label>Discount</label
+        ><input class="field-input" type="number" step="0.01" formControlName="discount" />
+      </div>
+      <button class="field-button" style="grid-column: 1/-1" type="submit">Add item</button>
+    </form>
+  </div>
+  <ul class="field-list">
+    @for (item of items(); track $index) {
+      <li>
+        <div class="field-page__heading">
+          <div>
+            <strong>{{ item.externalItemName }}</strong>
+            <p>
+              SKU {{ item.skuID ?? 'Unmapped' }} | Quantity {{ item.orderedQuantity }} | Unit price
+              {{ item.agreedUnitPrice ?? 'Not set' }}
+            </p>
+          </div>
+          <button
+            class="field-button field-button--danger"
+            type="button"
+            (click)="removeItem($index)"
+          >
+            Remove
+          </button>
+        </div>
+      </li>
+    } @empty {
+      <li>No PO items have been added.</li>
+    }
+  </ul>
+  <button class="field-button" type="button" (click)="submit()" [disabled]="saving()">
+    {{ saving() ? 'Submitting...' : 'Create and submit PO' }}
+  </button>
+</section>

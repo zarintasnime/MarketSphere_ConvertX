@@ -1,0 +1,75 @@
+<app-page-header
+  eyebrow="Procurement"
+  [title]="id ? 'Edit purchase order' : 'New purchase order'"
+  subtitle="Choose a supplier, branch, and one or more ordered SKUs."
+  secondaryActionLabel="Back"
+  (secondaryAction)="router.navigate(['/procurement/purchase-orders'])"
+/>
+@if (loading()) {
+  <app-loading-panel message="Loading purchase order..." />
+} @else {
+  @if (error()) {
+    <div class="alert error">{{ error() }}</div>
+  }
+  <form class="form-card" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-grid">
+      <label>Purchase order no.<input formControlName="purchaseOrderNo" /></label
+      ><label
+        >Supplier<select formControlName="supplierID">
+          <option [ngValue]="0">Select supplier</option>
+          @for (item of suppliers(); track item.supplierID) {
+            <option [ngValue]="item.supplierID">
+              {{ item.supplierCode }} — {{ item.supplierName }}
+            </option>
+          }
+        </select></label
+      ><label
+        >Approved requisition<select formControlName="purchaseRequisitionID">
+          <option [ngValue]="null">None</option>
+          @for (item of requisitions(); track item.purchaseRequisitionID) {
+            <option [ngValue]="item.purchaseRequisitionID">{{ item.purchaseRequisitionNo }}</option>
+          }
+        </select></label
+      ><label
+        >Branch<select formControlName="branchID">
+          <option [ngValue]="0">Select branch</option>
+          @for (item of branches(); track item.branchID) {
+            <option [ngValue]="item.branchID">{{ item.branchName }}</option>
+          }
+        </select></label
+      ><label>Order date<input type="date" formControlName="orderDate" /></label
+      ><label>Expected delivery<input type="date" formControlName="expectedDeliveryDate" /></label>
+    </div>
+    <section class="section-card" formArrayName="items">
+      <div class="section-heading">
+        <h2>Items</h2>
+        <button type="button" class="secondary" (click)="addItem()">Add item</button>
+      </div>
+      @for (group of items.controls; track $index) {
+        <div class="line-item" [formGroupName]="$index">
+          <label
+            >SKU<select formControlName="skuID">
+              <option [ngValue]="0">Select SKU</option>
+              @for (sku of skus(); track sku.skuID) {
+                <option [ngValue]="sku.skuID">{{ sku.skuCode }} — {{ sku.skuName }}</option>
+              }
+            </select></label
+          ><label
+            >Quantity<input type="number" step="0.01" formControlName="orderedQuantity" /></label
+          ><label>Unit cost<input type="number" step="0.01" formControlName="unitCost" /></label
+          ><label
+            >Discount<input type="number" step="0.01" formControlName="discountAmount" /></label
+          ><label>Tax<input type="number" step="0.01" formControlName="taxAmount" /></label>
+          <div class="line-total">{{ lineTotal($index) | number: '1.2-2' }}</div>
+          <button type="button" class="link danger" (click)="removeItem($index)">Remove</button>
+        </div>
+      }
+      <div class="summary-total">Net total: {{ netTotal() | number: '1.2-2' }}</div>
+    </section>
+    <div class="form-actions">
+      <button type="submit" [disabled]="saving()">
+        {{ saving() ? 'Saving...' : 'Save purchase order' }}
+      </button>
+    </div>
+  </form>
+}

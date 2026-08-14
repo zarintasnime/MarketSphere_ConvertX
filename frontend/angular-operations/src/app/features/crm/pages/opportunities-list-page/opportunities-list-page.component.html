@@ -1,0 +1,90 @@
+<section class="feature-page">
+  <app-page-header
+    eyebrow="CRM"
+    title="Opportunities"
+    subtitle="Manage pipeline value, probability, expected close dates, and stage progression."
+    [primaryActionLabel]="canManage() ? 'Create opportunity' : ''"
+    (primaryAction)="router.navigate(['/crm/opportunities/new'])"
+  />
+  <div class="feature-card">
+    <div class="toolbar">
+      <div class="form-field">
+        <label>Search</label
+        ><input
+          class="msx-input"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          (keyup.enter)="load(1)"
+          placeholder="Code or opportunity name"
+        />
+      </div>
+      <button class="msx-button msx-button--secondary" type="button" (click)="load(1)">
+        Search
+      </button>
+    </div>
+  </div>
+  @if (loading()) {
+    <app-loading-panel message="Loading opportunities..." />
+  } @else {
+    <div class="feature-card">
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Opportunity</th>
+              <th>Lead / Client</th>
+              <th>Owner</th>
+              <th>Stage</th>
+              <th>Expected Value</th>
+              <th>Probability</th>
+              <th>Close Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of result().items; track item.opportunityID) {
+              <tr>
+                <td>
+                  <strong>{{ item.opportunityName }}</strong
+                  ><br /><span class="muted-text">{{ item.opportunityCode }}</span>
+                </td>
+                <td>Lead {{ item.leadID ?? '—' }} / Client {{ item.clientID ?? '—' }}</td>
+                <td>#{{ item.ownerEmployeeID }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="stageLabel(item.stage)"
+                    [tone]="stageTone(item.stage)"
+                  />
+                </td>
+                <td>{{ item.expectedValue | number: '1.2-2' }}</td>
+                <td>{{ item.probabilityPercent }}%</td>
+                <td>{{ item.expectedCloseDate || 'Not set' }}</td>
+                <td>
+                  <a
+                    class="msx-button msx-button--secondary"
+                    [routerLink]="['/crm/opportunities', item.opportunityID]"
+                    >Open</a
+                  >
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">No opportunities were found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pagination
+        [pageNumber]="result().pageNumber"
+        [pageSize]="result().pageSize"
+        [totalCount]="result().totalCount"
+        [totalPages]="result().totalPages"
+        (pageChange)="load($event)"
+      />
+    </div>
+  }
+</section>
